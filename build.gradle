@@ -1,4 +1,6 @@
 plugins {
+    id 'org.springframework.boot' version '4.1.1'
+    id 'io.spring.dependency-management' version '1.1.7'
     id "org.sonarqube" version "7.5.0.8588"
     id 'org.cadixdev.licenser' version '0.6.1'
     id "jacoco"
@@ -87,6 +89,8 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // The production code uses the SLF4J logging API at compile time
     implementation 'org.slf4j:slf4j-api:2.0.5'
 
