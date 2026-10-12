@@ -12,6 +12,26 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['backend/src/main/java']
+        }
+        resources {
+            srcDirs = ['backend/src/main/resources']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['backend/src/test/java']
+        }
+        resources {
+            srcDirs = ['backend/src/test/resources']
+        }
+    }
+}
+
 configurations {
     checkstyleConfig
 }
@@ -27,6 +47,8 @@ checkstyle {
 
 sonarqube {
     properties {
+        property "sonar.sources", "backend/src/main/java"
+        property "sonar.tests", "backend/src/test/java"
         property "sonar.projectKey", "vidchayada_metric"
         property "sonar.organization", "vidchayada"
         property "sonar.host.url", "https://sonarcloud.io"
