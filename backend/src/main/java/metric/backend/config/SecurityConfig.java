@@ -54,9 +54,18 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/home/**").permitAll()
-                        .requestMatchers("/api/subscribers/**", "/image/**", "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/products/**",
+                                "/api/categories/**",
+                                "/api/home/**",
+                                "/image/**",
+                                "/images/**",
+                                "/uploads/**",
+                                "/static/**"
+                        ).permitAll()
+                        .requestMatchers("/image/**", "/images/**", "/uploads/**", "/api/subscribers/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/cart/**", "/api/orders/**").authenticated()
                         .anyRequest().authenticated()
