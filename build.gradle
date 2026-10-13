@@ -114,6 +114,7 @@ test {
 }
 
 license {
-    skipExistingHeaders = true
+    header = file('HEADER.txt')
     include '**/*.java'
+    exclude '**/*.properties'
 }
