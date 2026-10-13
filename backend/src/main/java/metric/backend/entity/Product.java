@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Vidchayada
+ * Licensed under the MIT License.
+ */
+
 package metric.backend.entity;
 
 import jakarta.persistence.CascadeType;

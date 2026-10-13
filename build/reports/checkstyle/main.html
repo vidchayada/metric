@@ -1,0 +1,985 @@
+<html>
+    <head>
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Checkstyle Violations</title>
+        <style type="text/css">
+                    body {
+                        background-color: #fff;
+                        color: #02303A;
+                    }
+
+                    a {
+                        color: #1DA2BD;
+                    }
+                    a.link {
+                        color: #02303A;
+                    }
+
+                    p {
+                        font-size: 1rem;
+                    }
+
+                    h1 a[name] {
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    tr:nth-child(even) {
+                        background: white;
+                    }
+
+                    th {
+                        font-weight:bold;
+                    }
+                    tr {
+                        background: #efefef;
+                    }
+                    table th, td, tr {
+                        font-size:100%;
+                        border: none;
+                        text-align: left;
+                        vertical-align: top;
+                    }
+                </style>
+    </head>
+    <body>
+        <p>
+            <a name="top">
+                <h1>Checkstyle Results</h1>
+            </a>
+        </p>
+        <hr align="left" width="95%" size="1">
+        <h2>Summary</h2>
+        <table class="summary" width="95%">
+            <tr>
+                <th>Total files checked</th><th>Total violations</th><th>Files with violations</th>
+            </tr>
+            <tr>
+                <td>23</td><td>179</td><td>23</td>
+            </tr>
+        </table>
+        <hr align="left" width="95%" size="1">
+        <div class="violations">
+            <h2>Violations</h2>
+            <p>
+                <table class="filelist" width="95%">
+                    <tr>
+                        <th>File</th><th>Total violations</th>
+                    </tr>
+                    <tr>
+                        <td><a href="#N65774">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/CartItemRepository.java</a></td><td>22</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66130">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/config/SecurityConfig.java</a></td><td>13</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66647">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/User.java</a></td><td>13</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66223">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/config/CorsConfig.java</a></td><td>12</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N65978">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/UserRepository.java</a></td><td>12</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N65694">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/ProductRepository.java</a></td><td>11</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66311">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Order.java</a></td><td>10</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N65574">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/OrderRepository.java</a></td><td>10</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66470">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Product.java</a></td><td>9</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66788">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/CartItem.java</a></td><td>8</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66594">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Category.java</a></td><td>7</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66385">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/OrderItem.java</a></td><td>7</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66742">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/ProductAttribute.java</a></td><td>6</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66537">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/ProductImage.java</a></td><td>6</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N65932">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/CategoryRepository.java</a></td><td>6</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N65648">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/SubscriberRepository.java</a></td><td>6</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66438">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Subscriber.java</a></td><td>4</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66066">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/OrderItemRepository.java</a></td><td>4</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66098">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/ProductAttributeRepository.java</a></td><td>4</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N65542">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/ProductImageRepository.java</a></td><td>4</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66859">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/BackendApplication.java</a></td><td>3</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66583">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/OrderStatus.java</a></td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#N66848">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Role.java</a></td><td>1</td>
+                    </tr>
+                </table>
+                <p></p>
+                
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66859">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/BackendApplication.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>21</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def rcurly' has incorrect indentation level 4, expected level should be 2.</td><td>22</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66223">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/config/CorsConfig.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>21</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>22</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>23</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>24</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>26</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>27</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>28</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def rcurly' has incorrect indentation level 4, expected level should be 2.</td><td>29</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66130">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/config/SecurityConfig.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>24</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>24</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>26</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def rcurly' has incorrect indentation level 4, expected level should be 2.</td><td>27</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>29</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>29</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>31</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Line is longer than 100 characters (found 109).</td><td>34</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Line is longer than 100 characters (found 110).</td><td>36</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method call rparen' has incorrect indentation level 16, expected level should be 8.</td><td>39</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def' child has incorrect indentation level 8, expected level should be 4.</td><td>41</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def rcurly' has incorrect indentation level 4, expected level should be 2.</td><td>42</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66788">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/CartItem.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>25</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>34</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>39</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>43</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>46</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>50</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>54</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>58</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66594">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Category.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>27</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>36</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>41</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>44</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>47</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>51</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>55</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66311">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Order.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>32</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>41</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>46</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>49</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>53</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>56</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>59</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>62</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>67</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>71</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66385">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/OrderItem.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>24</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>33</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>38</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>42</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>46</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>50</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>53</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66583">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/OrderStatus.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>8</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66470">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Product.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>30</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>39</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>44</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>48</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>51</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>54</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>57</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>61</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>65</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66742">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/ProductAttribute.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>23</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>32</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>37</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>41</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>44</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>47</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66537">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/ProductImage.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>23</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>32</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>37</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>41</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>44</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>48</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66848">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Role.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>8</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66438">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/Subscriber.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>22</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>31</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>35</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>38</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66647">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/entity/User.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>25</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>34</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>39</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>42</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>45</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>48</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>51</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>54</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>57</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>60</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>63</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>66</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'member def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>71</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N65774">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/CartItemRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>14</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByUser_UserId' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByUser_UserIdAndProduct_ProductIdAndAttribute_AttributeId' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findBySessionIdAndProduct_ProductIdAndAttribute_AttributeId' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>22</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>22</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>22</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'deleteByUser_UserId' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>22</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>23</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>23</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>23</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N65932">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/CategoryRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>14</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>17</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66066">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/OrderItemRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>13</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByOrder_OrderId' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>15</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N65574">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/OrderRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByUser_UserIdOrderByCreatedAtDesc' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>19</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>19</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>19</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N66098">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/ProductAttributeRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>13</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByProduct_ProductId' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>15</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N65542">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/ProductImageRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>13</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByProduct_ProductIdOrderBySortOrderAsc' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>15</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N65694">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/ProductRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByCategory_CategoryId' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Method name 'findByCategory_Slug' must match pattern '^[a-z][a-z0-9][a-zA-Z0-9]*$'.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Line is longer than 100 characters (found 103).</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>20</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>20</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N65648">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/SubscriberRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>13</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>16</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <div class="file-violation">
+                    <h3>
+                        <a class="link" name="N65978">/Users/gingerbread/Desktop/metric/backend/src/main/java/metric/backend/repository/UserRepository.java</a>
+                    </h3>
+                    <table class="violationlist" width="95%">
+                        <tr>
+                            <th>Severity</th><th>Description</th><th>Line Number</th>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>13</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>15</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>16</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>17</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'method def modifier' has incorrect indentation level 4, expected level should be 2.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>Missing a Javadoc comment.</td><td>18</td>
+                        </tr>
+                        <tr>
+                            <td>warning</td><td>'METHOD_DEF' should be separated from previous line.</td><td>18</td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <a href="#top">Back to top</a>
+                    <p></p>
+                </div>
+                <p></p>
+            </p>
+        </div>
+        <hr align="left" width="95%" size="1">
+        <p>
+            Generated by <a href="https://gradle.org">Gradle 8.14</a> with <a href="https://checkstyle.sourceforge.io/">Checkstyle 10.21.4</a>.
+        </p>
+    </body>
+</html>
