@@ -13,8 +13,28 @@ export const useCartStore = defineStore('cart', () => {
     async function load() {
         loading.value = true
         try {
-            items.value = await cartApi.list()
-            count.value = items.value.reduce((sum, i) => sum + i.quantity, 0)
+            const res: any = await cartApi.list()
+            const rawList = Array.isArray(res) ? res : (res?.items || [])
+            
+            const mapped = rawList.map((i: any) => ({
+                id: i.cartItemId ?? i.id,
+                productId: i.productId,
+                name: i.productName ?? i.name,
+                price: Number(i.unitPrice ?? i.price ?? 0),
+                quantity: i.quantity ?? 1,
+                image: i.imageUrl ?? i.image ?? '',
+                size: i.size,
+                color: i.color,
+                subtotal: Number(i.subtotal ?? ((i.unitPrice ?? i.price ?? 0) * i.quantity))
+            }))
+
+            items.value = mapped.sort((a: any, b: any) => a.id - b.id)
+
+            count.value = items.value.reduce((sum: number, i: any) => sum + i.quantity, 0)
+        } catch (e) {
+            console.error('Failed to load cart', e)
+            items.value = []
+            count.value = 0
         } finally {
             loading.value = false
         }

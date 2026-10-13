@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2026 Vidchayada
- * Licensed under the MIT License.
- */
-
 package metric.backend.dto;
 
 import java.math.BigDecimal;
@@ -22,4 +17,12 @@ public class CartResponse {
     private List<CartItemResponse> items;
     private Integer totalItems;
     private BigDecimal grandTotal;
+
+    public BigDecimal getTotal() {
+        return grandTotal;
+    }
+
+    public BigDecimal getSubtotal() {
+        return grandTotal;
+    }
 }
