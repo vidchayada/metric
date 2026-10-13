@@ -8,7 +8,33 @@ import { useCartStore } from '@/stores/cart'
 import { useToastStore } from '@/stores/toast'
 import SafeImage from '@/components/common/SafeImage.vue'
 import { formatPrice, isCssColor, sortSizes } from '@/utils/format'
-import type { ProductDetail } from '@/types'
+
+interface ProductAttribute {
+  attributeId?: number
+  id?: number
+  size?: string
+  color?: string
+  stockQty?: number
+}
+
+interface ProductImage {
+  id: number | string
+  url: string
+}
+
+interface ProductData {
+  productId?: number
+  id?: number
+  productName?: string
+  name?: string
+  basePrice?: number
+  price?: number
+  description?: string
+  categoryName?: string
+  imageUrls?: string[]
+  images?: Array<string | { id?: number | string; url?: string; imageUrl?: string }>
+  attributes?: ProductAttribute[]
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -16,7 +42,7 @@ const auth = useAuthStore()
 const cart = useCartStore()
 const toast = useToastStore()
 
-const product = ref<ProductDetail | null>(null)
+const product = ref<ProductData | null>(null)
 const status = ref<'loading' | 'ready' | 'missing' | 'error'>('loading')
 const activeImage = ref<string | null>(null)
 const color = ref<string | null>(null)
@@ -24,13 +50,60 @@ const size = ref<string | null>(null)
 const qty = ref(1)
 const adding = ref(false)
 
+const images = computed<ProductImage[]>(() => {
+  if (!product.value) return []
+  if (Array.isArray(product.value.imageUrls)) {
+    return product.value.imageUrls.map((url, idx) => ({ id: idx, url }))
+  }
+  if (Array.isArray(product.value.images)) {
+    return product.value.images.map((img, idx) => ({
+      id: typeof img === 'object' && img && 'id' in img && img.id ? img.id : idx,
+      url: typeof img === 'string' ? img : (img?.url ?? (img as any)?.imageUrl ?? ''),
+    }))
+  }
+  return []
+})
+
+const attributes = computed<ProductAttribute[]>(() => product.value?.attributes ?? [])
+
+const colors = computed<string[]>(() => {
+  const set = new Set<string>()
+  for (const a of attributes.value) {
+    if (a.color) set.add(a.color)
+  }
+  return Array.from(set)
+})
+
+const colorAttributes = computed<ProductAttribute[]>(() =>
+    attributes.value.filter((a) => !color.value || a.color === color.value)
+)
+
+const sizes = computed<string[]>(() => {
+  const set = new Set<string>()
+  for (const a of colorAttributes.value) {
+    if (a.size) set.add(a.size)
+  }
+  return sortSizes(Array.from(set))
+})
+
+const selected = computed<ProductAttribute | null>(() =>
+    colorAttributes.value.find((a) => (size.value ? a.size === size.value : !a.size)) ?? null
+)
+
+const hasSizes = computed(() => sizes.value.length > 0)
+const stock = computed(() => (hasSizes.value && !size.value ? 0 : (selected.value?.stockQty ?? 0)))
+const stockFor = (s: string) => colorAttributes.value.find((a) => a.size === s)?.stockQty ?? 0
+
 async function load(id: number) {
   status.value = 'loading'
   try {
-    const p = await catalogApi.product(id)
+    const p = (await catalogApi.product(id)) as ProductData
     product.value = p
-    const primary = p.images.find((i) => i.primary) ?? p.images[0]
-    activeImage.value = primary?.url ?? null
+
+    const imgList = Array.isArray(p.imageUrls) ? p.imageUrls : (p.images ?? [])
+    const firstImg = imgList[0]
+    activeImage.value = typeof firstImg === 'string' ? firstImg : (firstImg?.url ?? null)
+
     color.value = colors.value[0] ?? null
     size.value = null
     qty.value = 1
@@ -39,29 +112,20 @@ async function load(id: number) {
     status.value = statusOf(e) === 404 ? 'missing' : 'error'
   }
 }
+
 watch(() => route.params.id, (id) => id && load(Number(id)), { immediate: true })
-
-const attributes = computed(() => product.value?.attributes ?? [])
-const colors = computed(() => [...new Set(attributes.value.map((a) => a.color).filter((c): c is string => !!c))])
-
-/** Attributes that match the chosen colour (or all, when the product has no colours). */
-const colorAttributes = computed(() => attributes.value.filter((a) => !color.value || a.color === color.value))
-const sizes = computed(() => sortSizes([...new Set(colorAttributes.value.map((a) => a.size).filter((s): s is string => !!s))]))
-const selected = computed(() => colorAttributes.value.find((a) => (size.value ? a.size === size.value : !a.size)) ?? null)
-
-const hasSizes = computed(() => sizes.value.length > 0)
-const stock = computed(() => (hasSizes.value && !size.value ? 0 : (selected.value?.stockQty ?? 0)))
-const stockFor = (s: string) => colorAttributes.value.find((a) => a.size === s)?.stockQty ?? 0
 
 function pickColor(c: string) {
   color.value = c
   size.value = null
   qty.value = 1
 }
+
 function pickSize(s: string) {
   size.value = s
   qty.value = 1
 }
+
 function changeQty(delta: number) {
   const next = qty.value + delta
   if (next < 1) return
@@ -77,7 +141,9 @@ async function addToCart() {
 
   adding.value = true
   try {
-    await cart.add(product.value.id, selected.value.id, qty.value)
+    const prodId = product.value.productId ?? product.value.id ?? 0
+    const attrId = selected.value.attributeId ?? selected.value.id ?? 0
+    await cart.add(prodId, attrId, qty.value)
     toast.success('Added to cart!')
   } catch (e) {
     toast.error(apiError(e, 'Failed to add to cart.'))
@@ -99,17 +165,17 @@ async function addToCart() {
       <!-- gallery -->
       <section>
         <div class="aspect-[3/4] overflow-hidden rounded-2xl bg-blush-50">
-          <SafeImage :src="activeImage" :alt="product.name" class="h-full w-full object-cover" />
+          <SafeImage :src="activeImage" :alt="(product.productName ?? product.name) || ''" class="h-full w-full object-cover" />
         </div>
-        <div v-if="product.images.length > 1" class="mt-3 flex gap-2 overflow-x-auto">
+        <div v-if="images.length > 1" class="mt-3 flex gap-2 overflow-x-auto">
           <button
-              v-for="img in product.images"
+              v-for="img in images"
               :key="img.id"
               :class="['h-20 w-16 shrink-0 overflow-hidden rounded-lg ring-2 transition', img.url === activeImage ? 'ring-ink' : 'ring-transparent']"
               aria-label="View image"
               @click="activeImage = img.url"
           >
-            <SafeImage :src="img.url" :alt="product.name" class="h-full w-full object-cover" />
+            <SafeImage :src="img.url" :alt="(product.productName ?? product.name) || ''" class="h-full w-full object-cover" />
           </button>
         </div>
       </section>
@@ -118,8 +184,8 @@ async function addToCart() {
       <section class="space-y-6">
         <div>
           <p v-if="product.categoryName" class="text-xs tracking-widest text-muted uppercase">{{ product.categoryName }}</p>
-          <h1 class="mt-1 font-serif text-4xl font-light">{{ product.name }}</h1>
-          <p class="mt-2 text-xl">{{ formatPrice(product.price) }}</p>
+          <h1 class="mt-1 font-serif text-4xl font-light">{{ product.productName ?? product.name }}</h1>
+          <p class="mt-2 text-xl font-medium">{{ formatPrice(product.basePrice ?? product.price ?? 0) }}</p>
         </div>
 
         <div v-if="colors.length">
