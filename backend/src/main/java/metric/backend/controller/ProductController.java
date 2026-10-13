@@ -25,8 +25,21 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/categories")
-    public ResponseEntity<List<CategoryResponse>> getCategories() {
-        return ResponseEntity.ok(productService.getAllCategories());
+    public ResponseEntity<List<java.util.Map<String, Object>>> getCategories() {
+        var allCategories = productService.getAllCategories();
+
+        List<java.util.Map<String, Object>> response = new java.util.ArrayList<>();
+        if (allCategories != null) {
+            for (var cat : allCategories) {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("id", cat.getCategoryId());
+                map.put("name", cat.getCategoryName());
+                map.put("slug", cat.getSlug());
+                map.put("image", null);
+                response.add(map);
+            }
+        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/products")
