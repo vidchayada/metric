@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metric</a> &gt; <a href="index.source.html" class="el_package">metric.backend.service</a> &gt; <span class="el_source">OrderService.java</span></div><h1>OrderService.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2026 Vidchayada
+ * Licensed under the MIT License.
+ */
+
+package metric.backend.service;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import metric.backend.dto.CheckoutRequest;
+import metric.backend.dto.OrderItemResponse;
+import metric.backend.dto.OrderResponse;
+import metric.backend.entity.CartItem;
+import metric.backend.entity.Order;
+import metric.backend.entity.OrderItem;
+import metric.backend.entity.OrderStatus;
+import metric.backend.entity.ProductAttribute;
+import metric.backend.entity.ProductImage;
+import metric.backend.entity.User;
+import metric.backend.repository.CartItemRepository;
+import metric.backend.repository.OrderItemRepository;
+import metric.backend.repository.OrderRepository;
+import metric.backend.repository.ProductAttributeRepository;
+import metric.backend.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final CartItemRepository cartItemRepository;
+    private final ProductAttributeRepository productAttributeRepository;
+    private final UserRepository userRepository;
+
+    @Transactional
+    public OrderResponse checkout(Long userId, CheckoutRequest request) {
+<span class="nc" id="L44">        User user = userRepository.findById(userId)</span>
+<span class="nc" id="L45">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;User not found&quot;));</span>
+
+<span class="nc" id="L47">        List&lt;CartItem&gt; cartItems = cartItemRepository.findByUser_UserId(userId);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (cartItems.isEmpty()) {</span>
+<span class="nc" id="L49">            throw new IllegalArgumentException(&quot;Cannot checkout: Cart is empty&quot;);</span>
+        }
+
+<span class="nc" id="L52">        BigDecimal totalAmount = BigDecimal.ZERO;</span>
+
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        for (CartItem item : cartItems) {</span>
+<span class="nc" id="L55">            ProductAttribute attribute = item.getAttribute();</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (attribute.getStockQty() &lt; item.getQuantity()) {</span>
+<span class="nc" id="L57">                throw new IllegalArgumentException(&quot;Insufficient stock for product: &quot; + item.getProduct().getProductName());</span>
+            }
+<span class="nc" id="L59">            BigDecimal itemSubtotal = item.getProduct().getBasePrice().multiply(BigDecimal.valueOf(item.getQuantity()));</span>
+<span class="nc" id="L60">            totalAmount = totalAmount.add(itemSubtotal);</span>
+<span class="nc" id="L61">        }</span>
+
+<span class="nc" id="L63">        String orderNumber = &quot;#ORD-&quot; + UUID.randomUUID().toString().substring(0, 8).toUpperCase();</span>
+
+<span class="nc" id="L65">        Order order = Order.builder()</span>
+<span class="nc" id="L66">                .orderNumber(orderNumber)</span>
+<span class="nc" id="L67">                .user(user)</span>
+<span class="nc" id="L68">                .shippingAddress(request.getShippingAddress())</span>
+<span class="nc" id="L69">                .totalAmount(totalAmount)</span>
+<span class="nc" id="L70">                .status(OrderStatus.pending)</span>
+<span class="nc" id="L71">                .orderDate(OffsetDateTime.now())</span>
+<span class="nc" id="L72">                .build();</span>
+
+<span class="nc" id="L74">        Order savedOrder = orderRepository.save(order);</span>
+
+<span class="nc" id="L76">        List&lt;OrderItem&gt; orderItems = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        for (CartItem item : cartItems) {</span>
+<span class="nc" id="L78">            ProductAttribute attribute = item.getAttribute();</span>
+<span class="nc" id="L79">            attribute.setStockQty(attribute.getStockQty() - item.getQuantity());</span>
+<span class="nc" id="L80">            productAttributeRepository.save(attribute);</span>
+
+<span class="nc" id="L82">            OrderItem orderItem = OrderItem.builder()</span>
+<span class="nc" id="L83">                    .order(savedOrder)</span>
+<span class="nc" id="L84">                    .product(item.getProduct())</span>
+<span class="nc" id="L85">                    .attribute(attribute)</span>
+<span class="nc" id="L86">                    .quantity(item.getQuantity())</span>
+<span class="nc" id="L87">                    .unitPrice(item.getProduct().getBasePrice())</span>
+<span class="nc" id="L88">                    .build();</span>
+
+<span class="nc" id="L90">            orderItems.add(orderItemRepository.save(orderItem));</span>
+<span class="nc" id="L91">        }</span>
+
+<span class="nc" id="L93">        cartItemRepository.deleteByUser_UserId(userId);</span>
+
+<span class="nc" id="L95">        return mapToOrderResponse(savedOrder, orderItems);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;OrderResponse&gt; getUserOrders(Long userId) {
+<span class="nc" id="L100">        List&lt;Order&gt; orders = orderRepository.findByUser_UserIdOrderByOrderDateDesc(userId);</span>
+<span class="nc" id="L101">        return orders.stream().map(order -&gt; {</span>
+<span class="nc" id="L102">            List&lt;OrderItem&gt; items = orderItemRepository.findByOrder_OrderId(order.getOrderId());</span>
+<span class="nc" id="L103">            return mapToOrderResponse(order, items);</span>
+<span class="nc" id="L104">        }).toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderById(Long userId, Long orderId) {
+<span class="nc" id="L109">        Order order = orderRepository.findById(orderId)</span>
+<span class="nc" id="L110">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Order not found&quot;));</span>
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (!order.getUser().getUserId().equals(userId)) {</span>
+<span class="nc" id="L113">            throw new IllegalArgumentException(&quot;Unauthorized to view this order&quot;);</span>
+        }
+
+<span class="nc" id="L116">        List&lt;OrderItem&gt; items = orderItemRepository.findByOrder_OrderId(order.getOrderId());</span>
+<span class="nc" id="L117">        return mapToOrderResponse(order, items);</span>
+    }
+
+    private OrderResponse mapToOrderResponse(Order order, List&lt;OrderItem&gt; items) {
+<span class="nc" id="L121">        List&lt;OrderItemResponse&gt; itemResponses = items.stream().map(item -&gt; {</span>
+<span class="nc" id="L122">            String primaryImageUrl = null;</span>
+<span class="nc bnc" id="L123" title="All 4 branches missed.">            if (item.getProduct().getImages() != null &amp;&amp; !item.getProduct().getImages().isEmpty()) {</span>
+<span class="nc" id="L124">                primaryImageUrl = item.getProduct().getImages().stream()</span>
+<span class="nc" id="L125">                        .filter(img -&gt; Boolean.TRUE.equals(img.getIsPrimary()))</span>
+<span class="nc" id="L126">                        .map(ProductImage::getImageUrl)</span>
+<span class="nc" id="L127">                        .findFirst()</span>
+<span class="nc" id="L128">                        .orElse(item.getProduct().getImages().get(0).getImageUrl());</span>
+            }
+
+<span class="nc" id="L131">            BigDecimal subtotal = item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity()));</span>
+
+<span class="nc" id="L133">            return OrderItemResponse.builder()</span>
+<span class="nc" id="L134">                    .orderItemId(item.getItemId())</span>
+<span class="nc" id="L135">                    .productId(item.getProduct().getProductId())</span>
+<span class="nc" id="L136">                    .productName(item.getProduct().getProductName())</span>
+<span class="nc" id="L137">                    .imageUrl(primaryImageUrl)</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                    .attributeId(item.getAttribute() != null ? item.getAttribute().getAttributeId() : null)</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">                    .size(item.getAttribute() != null ? item.getAttribute().getSize() : null)</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">                    .color(item.getAttribute() != null ? item.getAttribute().getColor() : null)</span>
+<span class="nc" id="L141">                    .quantity(item.getQuantity())</span>
+<span class="nc" id="L142">                    .unitPrice(item.getUnitPrice())</span>
+<span class="nc" id="L143">                    .subtotal(subtotal)</span>
+<span class="nc" id="L144">                    .build();</span>
+<span class="nc" id="L145">        }).toList();</span>
+
+<span class="nc" id="L147">        return OrderResponse.builder()</span>
+<span class="nc" id="L148">                .orderId(order.getOrderId())</span>
+<span class="nc" id="L149">                .orderNumber(order.getOrderNumber())</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">                .userId(order.getUser() != null ? order.getUser().getUserId() : null)</span>
+<span class="nc" id="L151">                .shippingAddress(order.getShippingAddress())</span>
+<span class="nc" id="L152">                .totalAmount(order.getTotalAmount())</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                .status(order.getStatus() != null ? order.getStatus().name() : null)</span>
+<span class="nc" id="L154">                .orderDate(order.getOrderDate())</span>
+<span class="nc" id="L155">                .items(itemResponses)</span>
+<span class="nc" id="L156">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
