@@ -155,4 +155,24 @@ public class OrderService {
                 .items(itemResponses)
                 .build();
     }
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getAllOrdersForAdmin() {
+        List<Order> orders = orderRepository.findAllByOrderByOrderDateDesc();
+        return orders.stream().map(order -> {
+            List<OrderItem> items = orderItemRepository.findByOrder_OrderId(order.getOrderId());
+            return mapToOrderResponse(order, items);
+        }).toList();
+    }
+
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, metric.backend.entity.OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
+
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+
+        List<OrderItem> items = orderItemRepository.findByOrder_OrderId(updatedOrder.getOrderId());
+        return mapToOrderResponse(updatedOrder, items);
+    }
 }

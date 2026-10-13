@@ -155,5 +155,25 @@ public class OrderService {
 <span class="nc" id="L155">                .items(itemResponses)</span>
 <span class="nc" id="L156">                .build();</span>
     }
+    @Transactional(readOnly = true)
+    public List&lt;OrderResponse&gt; getAllOrdersForAdmin() {
+<span class="nc" id="L160">        List&lt;Order&gt; orders = orderRepository.findAllByOrderByOrderDateDesc();</span>
+<span class="nc" id="L161">        return orders.stream().map(order -&gt; {</span>
+<span class="nc" id="L162">            List&lt;OrderItem&gt; items = orderItemRepository.findByOrder_OrderId(order.getOrderId());</span>
+<span class="nc" id="L163">            return mapToOrderResponse(order, items);</span>
+<span class="nc" id="L164">        }).toList();</span>
+    }
+
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, metric.backend.entity.OrderStatus newStatus) {
+<span class="nc" id="L169">        Order order = orderRepository.findById(orderId)</span>
+<span class="nc" id="L170">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Order not found with id: &quot; + orderId));</span>
+
+<span class="nc" id="L172">        order.setStatus(newStatus);</span>
+<span class="nc" id="L173">        Order updatedOrder = orderRepository.save(order);</span>
+
+<span class="nc" id="L175">        List&lt;OrderItem&gt; items = orderItemRepository.findByOrder_OrderId(updatedOrder.getOrderId());</span>
+<span class="nc" id="L176">        return mapToOrderResponse(updatedOrder, items);</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
