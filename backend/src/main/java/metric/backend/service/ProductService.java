@@ -56,4 +56,24 @@ public class ProductService {
                 .map(productMapper::toProductResponse)
                 .toList();
     }
+
+    public List<ProductResponse> getProducts(Long categoryId, String search) {
+        return productRepository.findAll().stream()
+                .filter(p -> {
+                    if (categoryId != null && p.getCategory() != null) {
+                        if (!categoryId.equals(p.getCategory().getCategoryId())) {
+                            return false;
+                        }
+                    }
+                    if (search != null && !search.trim().isEmpty()) {
+                        String keyword = search.trim().toLowerCase();
+                        boolean matchName = p.getProductName() != null && p.getProductName().toLowerCase().contains(keyword);
+                        boolean matchDesc = p.getDescription() != null && p.getDescription().toLowerCase().contains(keyword);
+                        return matchName || matchDesc;
+                    }
+                    return true;
+                })
+                .map(productMapper::toProductResponse)
+                .toList();
+    }
 }

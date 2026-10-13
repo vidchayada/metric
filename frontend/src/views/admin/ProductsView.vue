@@ -25,6 +25,15 @@ const attributes = ref<AdminAttribute[]>([])
 
 const emptyRow = (): AdminAttribute => ({ size: '', color: '', stockQty: 0 })
 
+function getTotalStock(p: any): number {
+  if (p?.totalStock !== undefined && p?.totalStock !== null) {
+    return Number(p.totalStock)
+  }
+  const attrs = p?.attributes ?? p?.productAttributes ?? []
+  if (!Array.isArray(attrs) || attrs.length === 0) return 0
+  return attrs.reduce((sum: number, a: any) => sum + Number(a.stockQty ?? a.stock ?? 0), 0)
+}
+
 async function load() {
   loading.value = true
   try {
@@ -42,22 +51,59 @@ onMounted(async () => {
   } catch (e) {
     toast.error(apiError(e))
   }
-  load()
+  await load()
 })
-watch(categoryFilter, load)
+
+watch(categoryFilter, async () => {
+  await load()
+})
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+function onSearchInput() {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(async () => {
+    await load()
+  }, 300)
+}
 
 function openCreate() {
   editingId.value = null
-  Object.assign(form, { categoryId: '', name: '', detail: '', price: 0 })
+  const defaultCat = categories.value.length
+      ? ((categories.value[0] as any).categoryId ?? (categories.value[0] as any).id ?? '')
+      : ''
+
+  Object.assign(form, {
+    categoryId: defaultCat,
+    name: '',
+    detail: '',
+    price: 0,
+  })
   attributes.value = [emptyRow()]
   images.value = []
   modalOpen.value = true
 }
 
 function openEdit(p: AdminProduct) {
-  editingId.value = p.id
-  Object.assign(form, { categoryId: p.categoryId ?? '', name: p.name, detail: p.detail ?? '', price: p.price })
-  attributes.value = p.attributes.length ? p.attributes.map((a) => ({ ...a })) : [emptyRow()]
+  editingId.value = (p as any).productId ?? (p as any).id ?? null
+
+  const catId = (p as any).categoryId ?? (p as any).category?.categoryId ?? (p as any).category?.id ?? ''
+
+  Object.assign(form, {
+    categoryId: catId,
+    name: (p as any).productName ?? p.name ?? '',
+    detail: (p as any).description ?? p.detail ?? '',
+    price: (p as any).basePrice ?? (p as any).price ?? 0,
+  })
+
+  const rawAttrs = (p as any).attributes ?? (p as any).productAttributes ?? []
+  attributes.value = rawAttrs.length
+      ? rawAttrs.map((a: any) => ({
+        size: a.size ?? '',
+        color: a.color ?? '',
+        stockQty: Number(a.stockQty ?? a.stock ?? 0),
+      }))
+      : [emptyRow()]
+
   images.value = []
   modalOpen.value = true
 }
@@ -72,16 +118,30 @@ const onFiles = (e: Event) => (images.value = Array.from((e.target as HTMLInputE
 async function save() {
   if (form.categoryId === '') return toast.error('Please select a category.')
   saving.value = true
+
   const payload = {
+    productName: form.name.trim(),
     name: form.name.trim(),
+    description: form.detail.trim(),
     detail: form.detail.trim(),
+    basePrice: Number(form.price) || 0,
     price: Number(form.price) || 0,
-    categoryId: form.categoryId,
-    attributes: attributes.value.filter((a) => a.size.trim() || a.color.trim()).map((a) => ({ ...a, stockQty: Number(a.stockQty) || 0 })),
+    categoryId: Number(form.categoryId),
+    attributes: attributes.value
+        .filter((a) => a.size.trim() || a.color.trim())
+        .map((a) => ({
+          size: a.size.trim(),
+          color: a.color.trim(),
+          stockQty: Number(a.stockQty) || 0,
+        })),
   }
+
   try {
-    if (editingId.value === null) await adminApi.createProduct(payload, images.value)
-    else await adminApi.updateProduct(editingId.value, payload, images.value)
+    if (editingId.value === null) {
+      await adminApi.createProduct(payload as any, images.value)
+    } else {
+      await adminApi.updateProduct(editingId.value, payload as any, images.value)
+    }
     toast.success(editingId.value === null ? 'Product created' : 'Product updated')
     modalOpen.value = false
     await load()
@@ -93,9 +153,14 @@ async function save() {
 }
 
 async function remove(p: AdminProduct) {
-  if (!confirm(`Delete "${p.name}"?`)) return
+  const targetId = (p as any).productId ?? (p as any).id
+  if (!targetId) return toast.error('Product ID not found')
+
+  const displayName = (p as any).productName ?? p.name ?? 'this product'
+  if (!confirm(`Delete "${displayName}"?`)) return
+
   try {
-    await adminApi.deleteProduct(p.id)
+    await adminApi.deleteProduct(targetId)
     toast.success('Product deleted')
     await load()
   } catch (e) {
@@ -114,35 +179,73 @@ async function remove(p: AdminProduct) {
       <div class="flex flex-wrap items-center gap-2">
         <select v-model="categoryFilter" class="field w-auto" aria-label="Filter by category">
           <option value="">All Categories</option>
-          <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+          <option
+              v-for="c in categories"
+              :key="(c as any).categoryId ?? (c as any).id"
+              :value="(c as any).categoryId ?? (c as any).id"
+          >
+            {{ (c as any).categoryName ?? (c as any).name }}
+          </option>
         </select>
-        <input v-model="search" placeholder="Search product name" aria-label="Search products" class="field w-56" @keyup.enter="load" />
+        <input
+            v-model="search"
+            placeholder="Search product name"
+            aria-label="Search products"
+            class="field w-56"
+            @input="onSearchInput"
+            @keyup.enter="load"
+        />
         <button class="btn !h-10 !w-10 !px-0 text-lg" aria-label="Add product" @click="openCreate">+</button>
       </div>
     </div>
 
-    <p v-if="!loading && !products.length" class="py-16 text-center text-muted">No products found. Add your first product!</p>
+    <p v-if="!loading && !products.length" class="py-16 text-center text-muted">
+      No products found. Add your first product!
+    </p>
 
     <ul v-else class="space-y-3">
-      <li v-for="p in products" :key="p.id" class="grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-line md:grid-cols-[88px_1fr_1fr_auto] md:items-center">
+      <li
+          v-for="p in products"
+          :key="(p as any).productId ?? (p as any).id"
+          class="grid gap-4 rounded-2xl bg-white p-4 ring-1 ring-line md:grid-cols-[88px_1fr_1fr_auto] md:items-center"
+      >
         <div class="h-28 w-22 overflow-hidden rounded-lg bg-blush-50 md:h-28">
-          <SafeImage :src="p.mainImage" :alt="p.name" class="h-full w-full object-cover" />
+          <SafeImage
+              :src="(p as any).imageUrls?.[0] ?? (p as any).mainImage ?? (p as any).primaryImageUrl"
+              :alt="(p as any).productName ?? p.name"
+              class="h-full w-full object-cover"
+          />
         </div>
         <div class="min-w-0">
-          <p class="font-medium">{{ p.name }}</p>
-          <p class="line-clamp-2 text-sm text-muted">{{ p.detail || 'No detail' }}</p>
+          <p class="font-medium">{{ (p as any).productName ?? p.name }}</p>
+          <p class="line-clamp-2 text-sm text-muted">{{ (p as any).description ?? p.detail ?? 'No detail' }}</p>
         </div>
         <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-          <dt class="text-xs tracking-wider text-muted uppercase">Category</dt><dd>{{ p.categoryName ?? '-' }}</dd>
-          <dt class="text-xs tracking-wider text-muted uppercase">Price</dt><dd>{{ formatPrice(p.price) }}</dd>
+          <dt class="text-xs tracking-wider text-muted uppercase">Category</dt>
+          <dd>{{ (p as any).categoryName ?? (p as any).category?.categoryName ?? (p as any).category?.name ?? '-' }}</dd>
+          <dt class="text-xs tracking-wider text-muted uppercase">Price</dt>
+          <dd>{{ formatPrice((p as any).basePrice ?? (p as any).price ?? 0) }}</dd>
           <dt class="text-xs tracking-wider text-muted uppercase">Stock</dt>
-          <dd :class="p.totalStock === 0 ? 'text-red-600' : ''">{{ p.totalStock }} items</dd>
+          <dd :class="getTotalStock(p) === 0 ? 'text-red-600' : ''">
+            {{ getTotalStock(p) }} items
+          </dd>
           <dt class="text-xs tracking-wider text-muted uppercase">Variants</dt>
-          <dd>{{ p.attributes.map((a) => [a.size, a.color].filter(Boolean).join(' / ')).join(', ') || '—' }}</dd>
+          <dd>
+            {{
+              ((p as any).attributes ?? (p as any).productAttributes ?? [])
+                  .map((a: any) => [a.size, a.color].filter(Boolean).join(' / '))
+                  .join(', ') || '—'
+            }}
+          </dd>
         </dl>
         <div class="flex gap-2 md:flex-col">
           <button class="btn !py-1.5" @click="openEdit(p)">Edit</button>
-          <button class="btn-outline !border-red-300 !py-1.5 !text-red-700 hover:!bg-red-600 hover:!text-white" @click="remove(p)">Delete</button>
+          <button
+              class="btn-outline !border-red-300 !py-1.5 !text-red-700 hover:!bg-red-600 hover:!text-white"
+              @click="remove(p)"
+          >
+            Delete
+          </button>
         </div>
       </li>
     </ul>
@@ -153,13 +256,28 @@ async function remove(p: AdminProduct) {
           <label for="p-cat" class="field-label">Category</label>
           <select id="p-cat" v-model="form.categoryId" required class="field">
             <option value="" disabled>Select Category</option>
-            <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+            <option
+                v-for="c in categories"
+                :key="(c as any).categoryId ?? (c as any).id"
+                :value="(c as any).categoryId ?? (c as any).id"
+            >
+              {{ (c as any).categoryName ?? (c as any).name }}
+            </option>
           </select>
         </div>
-        <div><label for="p-name" class="field-label">Product name</label><input id="p-name" v-model="form.name" required placeholder="Cotton Shirt" class="field" /></div>
-        <div><label for="p-detail" class="field-label">Detail</label><textarea id="p-detail" v-model="form.detail" rows="3" placeholder="About your product..." class="field" /></div>
+        <div>
+          <label for="p-name" class="field-label">Product name</label>
+          <input id="p-name" v-model="form.name" required placeholder="Cotton Shirt" class="field" />
+        </div>
+        <div>
+          <label for="p-detail" class="field-label">Detail</label>
+          <textarea id="p-detail" v-model="form.detail" rows="3" placeholder="About your product..." class="field" />
+        </div>
         <div class="grid grid-cols-2 gap-4">
-          <div><label for="p-price" class="field-label">Price (฿)</label><input id="p-price" v-model.number="form.price" type="number" min="0" required class="field" /></div>
+          <div>
+            <label for="p-price" class="field-label">Price (฿)</label>
+            <input id="p-price" v-model.number="form.price" type="number" min="0" required class="field" />
+          </div>
           <div>
             <label for="p-images" class="field-label">Images</label>
             <input id="p-images" type="file" multiple accept="image/*" class="field text-xs" @change="onFiles" />

@@ -1,24 +1,17 @@
-/*
- * Copyright (c) 2026 Vidchayada
- * Licensed under the MIT License.
- */
-
 package metric.backend.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import metric.backend.dto.CreateProductRequest;
 import metric.backend.dto.ProductResponse;
 import metric.backend.service.AdminProductService;
+import metric.backend.service.ProductService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -26,19 +19,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminProductController {
 
     private final AdminProductService adminProductService;
+    private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(
-            @Valid @RequestBody CreateProductRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(adminProductService.createProduct(request));
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getAllProducts(
+            @RequestParam(required = false) Long category,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(productService.getProducts(category, search));
     }
 
-    @PutMapping("/{productId}")
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<ProductResponse> createProduct(
+            @Valid @RequestPart("data") CreateProductRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(adminProductService.createProduct(request, images));
+    }
+
+    @PutMapping(value = "/{productId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long productId,
-            @Valid @RequestBody CreateProductRequest request) {
-        return ResponseEntity.ok(adminProductService.updateProduct(productId, request));
+            @Valid @RequestPart("data") CreateProductRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        return ResponseEntity.ok(adminProductService.updateProduct(productId, request, images));
     }
 
     @DeleteMapping("/{productId}")

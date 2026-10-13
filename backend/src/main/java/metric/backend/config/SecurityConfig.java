@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/products/**",
                                 "/api/categories/**",
@@ -67,7 +67,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/image/**", "/images/**", "/uploads/**", "/api/subscribers/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/cart/**", "/api/orders/**").authenticated()
+                        .requestMatchers("/api/cart/**", "/api/orders/**", "/api/auth/me").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
