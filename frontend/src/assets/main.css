@@ -1,35 +1,49 @@
-@import './base.css';
+@import "tailwindcss";
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+/* Design tokens. The original CSS files were not available, so these are a
+   soft blush / ink palette taken from the old fonts and mood. Adjust freely. */
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --color-ink: #1f1a1b;
+  --color-muted: #7a6f72;
+  --color-line: #ece4e6;
+  --color-blush-50: #fdf7f8;
+  --color-blush-100: #f9eaed;
+  --color-blush-300: #efc3cc;
+  --color-blush-500: #d98c9c;
+  --color-blush-700: #a8566a;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
+@layer base {
   body {
-    display: flex;
-    place-items: center;
+    @apply bg-white font-sans text-ink antialiased;
   }
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-2.5 text-xs font-medium tracking-widest text-white uppercase transition hover:bg-blush-700 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink px-6 py-2.5 text-xs font-medium tracking-widest text-ink uppercase transition hover:bg-ink hover:text-white disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .field {
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blush-500 read-only:bg-blush-50 read-only:text-muted;
+  }
+  .field-label {
+    @apply mb-1 block text-xs font-medium tracking-wider text-muted uppercase;
+  }
+  .field-error {
+    @apply mt-1 text-xs text-red-600;
+  }
+  .page-title {
+    @apply font-serif text-4xl font-light tracking-wide;
+  }
+  .fade-up {
+    @apply translate-y-4 opacity-0 transition duration-700;
+  }
+  .fade-up.is-visible {
+    @apply translate-y-0 opacity-100;
   }
 }
