@@ -5,6 +5,7 @@
 
 package metric.backend.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import metric.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -29,29 +30,37 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-<span class="fc" id="L32">        return new BCryptPasswordEncoder();</span>
+<span class="fc" id="L33">        return new BCryptPasswordEncoder();</span>
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-<span class="fc" id="L37">        http</span>
-<span class="fc" id="L38">                .csrf(AbstractHttpConfigurer::disable)</span>
-<span class="fc" id="L39">                .formLogin(AbstractHttpConfigurer::disable)</span>
-<span class="fc" id="L40">                .httpBasic(AbstractHttpConfigurer::disable)</span>
-<span class="fc" id="L41">                .cors(Customizer.withDefaults())</span>
-<span class="fc" id="L42">                .sessionManagement(session -&gt;</span>
-<span class="fc" id="L43">                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span>
+<span class="fc" id="L38">        http</span>
+<span class="fc" id="L39">                .csrf(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L40">                .formLogin(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L41">                .httpBasic(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L42">                .cors(Customizer.withDefaults())</span>
+<span class="fc" id="L43">                .sessionManagement(session -&gt;</span>
+<span class="fc" id="L44">                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span>
                 )
-<span class="fc" id="L45">                .authorizeHttpRequests(auth -&gt; auth</span>
-<span class="fc" id="L46">                        .requestMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll()</span>
-<span class="fc" id="L47">                        .requestMatchers(&quot;/api/auth/**&quot;).permitAll()</span>
-<span class="fc" id="L48">                        .requestMatchers(HttpMethod.GET, &quot;/api/products/**&quot;, &quot;/api/categories/**&quot;).permitAll()</span>
-<span class="fc" id="L49">                        .requestMatchers(&quot;/api/subscribers/**&quot;).permitAll()</span>
-<span class="fc" id="L50">                        .anyRequest().authenticated()</span>
+<span class="fc" id="L46">                .exceptionHandling(ex -&gt; ex</span>
+<span class="fc" id="L47">                        .authenticationEntryPoint((request, response, authException) -&gt; {</span>
+<span class="nc" id="L48">                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
+<span class="nc" id="L49">                            response.setContentType(&quot;application/json&quot;);</span>
+<span class="nc" id="L50">                            response.getWriter().write(&quot;{\&quot;error\&quot;: \&quot;Unauthorized: &quot; + authException.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L51">                        })</span>
                 )
-<span class="fc" id="L52">                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);</span>
+<span class="fc" id="L53">                .authorizeHttpRequests(auth -&gt; auth</span>
+<span class="fc" id="L54">                        .requestMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll()</span>
+<span class="fc" id="L55">                        .requestMatchers(&quot;/api/auth/**&quot;).permitAll()</span>
+<span class="fc" id="L56">                        .requestMatchers(HttpMethod.GET, &quot;/api/products/**&quot;, &quot;/api/categories/**&quot;).permitAll()</span>
+<span class="fc" id="L57">                        .requestMatchers(&quot;/api/subscribers/**&quot;).permitAll()</span>
+<span class="fc" id="L58">                        .requestMatchers(&quot;/api/cart/**&quot;).authenticated()</span>
+<span class="fc" id="L59">                        .anyRequest().authenticated()</span>
+                )
+<span class="fc" id="L61">                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);</span>
 
-<span class="fc" id="L54">        return http.build();</span>
+<span class="fc" id="L63">        return http.build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
