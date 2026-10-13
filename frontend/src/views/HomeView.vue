@@ -45,7 +45,7 @@ onBeforeUnmount(() => clearInterval(timer))
 <template>
   <div>
     <section class="relative">
-      <SafeImage src="/images/hero.jpg" alt="Hero collection" class="h-[70vh] w-full object-cover" />
+      <SafeImage src="/image/hero.jpg" alt="Hero collection" class="h-[70vh] w-full object-cover" />
       <div class="absolute inset-0 flex items-end bg-gradient-to-t from-ink/50 to-transparent">
         <div class="mx-auto w-full max-w-7xl px-4 pb-14 lg:px-8">
           <h1 class="max-w-xl font-serif text-4xl leading-tight font-light text-white md:text-6xl">

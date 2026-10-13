@@ -34,6 +34,26 @@ public class CartController {
         return ResponseEntity.ok(cartService.getCart(user.getUserId()));
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<java.util.Map<String, Integer>> getCartCount(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.ok(java.util.Map.of("count", 0));
+        }
+
+        try {
+            CartResponse cart = cartService.getCart(user.getUserId());
+            int count = 0;
+            if (cart != null && cart.getItems() != null) {
+                count = cart.getItems().stream()
+                        .mapToInt(item -> item.getQuantity() != null ? item.getQuantity() : 1)
+                        .sum();
+            }
+            return ResponseEntity.ok(java.util.Map.of("count", count));
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.Map.of("count", 0));
+        }
+    }
+
     @PostMapping
     public ResponseEntity<CartResponse> addToCart(
             @AuthenticationPrincipal User user,

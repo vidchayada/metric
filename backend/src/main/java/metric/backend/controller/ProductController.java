@@ -51,4 +51,54 @@ public class ProductController {
         }
         return ResponseEntity.ok(product);
     }
+
+    @GetMapping("/home")
+    public ResponseEntity<java.util.Map<String, Object>> getHomeData() {
+        var allProducts = productService.getAllProducts();
+        var allCategories = productService.getAllCategories();
+        var bestSellers = (allProducts != null)
+                ? allProducts.stream().limit(4).toList()
+                : java.util.Collections.<ProductResponse>emptyList();
+
+        String newestImage = null;
+        if (allProducts != null) {
+            for (ProductResponse p : allProducts) {
+                if (p.getImageUrls() != null && !p.getImageUrls().isEmpty() && p.getImageUrls().get(0) != null) {
+                    newestImage = p.getImageUrls().get(0);
+                    break;
+                }
+            }
+        }
+
+        java.util.List<java.util.Map<String, Object>> formattedCategories = new java.util.ArrayList<>();
+        if (allCategories != null) {
+            for (CategoryResponse cat : allCategories) {
+                String catImage = null;
+                if (allProducts != null) {
+                    for (ProductResponse prod : allProducts) {
+                        if (prod.getCategoryId() != null && prod.getCategoryId().equals(cat.getCategoryId())) {
+                            if (prod.getImageUrls() != null && !prod.getImageUrls().isEmpty()) {
+                                catImage = prod.getImageUrls().get(0);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                java.util.Map<String, Object> cMap = new java.util.HashMap<>();
+                cMap.put("id", cat.getCategoryId());
+                cMap.put("name", cat.getCategoryName());
+                cMap.put("slug", cat.getSlug());
+                cMap.put("image", catImage != null ? catImage : "");
+                formattedCategories.add(cMap);
+            }
+        }
+
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("bestSellers", bestSellers);
+        response.put("categories", formattedCategories);
+        response.put("newestImage", newestImage != null ? newestImage : "");
+
+        return ResponseEntity.ok(response);
+    }
 }
