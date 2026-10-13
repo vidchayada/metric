@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Vidchayada
+ * Licensed under the MIT License.
+ */
+
 package metric.backend.service;
 
 import java.util.List;
