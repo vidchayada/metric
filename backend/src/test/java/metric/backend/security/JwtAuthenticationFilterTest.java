@@ -47,7 +47,7 @@ class JwtAuthenticationFilterTest {
     User user = User.builder()
         .userId(1L)
         .username("alice")
-        .role(Role.admin)
+        .role(Role.ADMIN)
         .build();
 
     when(jwtTokenProvider.validateToken("valid-token")).thenReturn(true);
@@ -81,7 +81,7 @@ class JwtAuthenticationFilterTest {
 
     User user = User.builder()
         .username("bob")
-        .role(Role.user)
+        .role(Role.USER)
         .build();
 
     when(jwtTokenProvider.validateToken("user-token")).thenReturn(true);

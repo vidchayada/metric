@@ -13,7 +13,7 @@ class OrderTest {
   void shouldInitializeBuilderDefaults() {
     Order order = Order.builder().build();
 
-    assertEquals(OrderStatus.pending, order.getStatus());
+    assertEquals(OrderStatus.PENDING, order.getStatus());
     assertNotNull(order.getOrderItems());
     assertTrue(order.getOrderItems().isEmpty());
     assertNull(order.getOrderId());
@@ -38,7 +38,7 @@ class OrderTest {
         .orderDate(now)
         .shippingAddress("Chiang Mai")
         .totalAmount(new BigDecimal("150.00"))
-        .status(OrderStatus.processing)
+        .status(OrderStatus.PROCESSING)
         .createdAt(now)
         .orderItems(new ArrayList<>(java.util.List.of(item)))
         .build();
@@ -49,7 +49,7 @@ class OrderTest {
     assertEquals(now, order.getOrderDate());
     assertEquals("Chiang Mai", order.getShippingAddress());
     assertEquals(new BigDecimal("150.00"), order.getTotalAmount());
-    assertEquals(OrderStatus.processing, order.getStatus());
+    assertEquals(OrderStatus.PROCESSING, order.getStatus());
     assertEquals(now, order.getCreatedAt());
     assertEquals(1, order.getOrderItems().size());
 
@@ -59,7 +59,7 @@ class OrderTest {
     order.setOrderDate(null);
     order.setShippingAddress("Bangkok");
     order.setTotalAmount(BigDecimal.ZERO);
-    order.setStatus(OrderStatus.completed);
+    order.setStatus(OrderStatus.COMPLETED);
     order.setCreatedAt(null);
     order.setOrderItems(new ArrayList<>());
 
@@ -69,7 +69,7 @@ class OrderTest {
     assertNull(order.getOrderDate());
     assertEquals("Bangkok", order.getShippingAddress());
     assertEquals(BigDecimal.ZERO, order.getTotalAmount());
-    assertEquals(OrderStatus.completed, order.getStatus());
+    assertEquals(OrderStatus.COMPLETED, order.getStatus());
     assertNull(order.getCreatedAt());
     assertTrue(order.getOrderItems().isEmpty());
   }
@@ -80,14 +80,14 @@ class OrderTest {
 
     Order order = new Order(
         1L, "ORD-001", null, null, "Address",
-        BigDecimal.TEN, OrderStatus.pending, null,
+        BigDecimal.TEN, OrderStatus.PENDING, null,
         new ArrayList<>());
 
     assertEquals(1L, order.getOrderId());
     assertEquals("ORD-001", order.getOrderNumber());
     assertEquals("Address", order.getShippingAddress());
     assertEquals(BigDecimal.TEN, order.getTotalAmount());
-    assertEquals(OrderStatus.pending, order.getStatus());
+    assertEquals(OrderStatus.PENDING, order.getStatus());
     assertNotNull(order.getOrderItems());
   }
 }

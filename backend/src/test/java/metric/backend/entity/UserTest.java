@@ -12,7 +12,7 @@ class UserTest {
   void shouldInitializeBuilderDefaultRole() {
     User user = User.builder().build();
 
-    assertEquals(Role.user, user.getRole());
+    assertEquals(Role.USER, user.getRole());
     assertNull(user.getUserId());
     assertNull(user.getFullName());
     assertNull(user.getUsername());
@@ -42,7 +42,7 @@ class UserTest {
         .dateOfBirth(birthDate)
         .address("Chiang Mai, Thailand")
         .profileImage("/avatars/alice.png")
-        .role(Role.admin)
+        .role(Role.ADMIN)
         .createdAt(createdAt)
         .build();
 
@@ -56,7 +56,7 @@ class UserTest {
     assertEquals(birthDate, user.getDateOfBirth());
     assertEquals("Chiang Mai, Thailand", user.getAddress());
     assertEquals("/avatars/alice.png", user.getProfileImage());
-    assertEquals(Role.admin, user.getRole());
+    assertEquals(Role.ADMIN, user.getRole());
     assertEquals(createdAt, user.getCreatedAt());
   }
 
@@ -77,7 +77,7 @@ class UserTest {
     user.setDateOfBirth(birthDate);
     user.setAddress("Bangkok");
     user.setProfileImage("/avatars/bob.png");
-    user.setRole(Role.admin);
+    user.setRole(Role.ADMIN);
     user.setCreatedAt(createdAt);
 
     assertEquals(2L, user.getUserId());
@@ -90,7 +90,7 @@ class UserTest {
     assertEquals(birthDate, user.getDateOfBirth());
     assertEquals("Bangkok", user.getAddress());
     assertEquals("/avatars/bob.png", user.getProfileImage());
-    assertEquals(Role.admin, user.getRole());
+    assertEquals(Role.ADMIN, user.getRole());
     assertEquals(createdAt, user.getCreatedAt());
   }
 
@@ -110,7 +110,7 @@ class UserTest {
         birthDate,
         "Thailand",
         "/avatar.png",
-        Role.user,
+        Role.USER,
         createdAt);
 
     assertEquals(1L, user.getUserId());
@@ -123,7 +123,7 @@ class UserTest {
     assertEquals(birthDate, user.getDateOfBirth());
     assertEquals("Thailand", user.getAddress());
     assertEquals("/avatar.png", user.getProfileImage());
-    assertEquals(Role.user, user.getRole());
+    assertEquals(Role.USER, user.getRole());
     assertEquals(createdAt, user.getCreatedAt());
   }
 

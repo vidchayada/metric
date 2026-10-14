@@ -9,20 +9,20 @@ class RoleTest {
   @Test
   void shouldContainAllExpectedRoles() {
     assertArrayEquals(
-        new Role[]{Role.user, Role.admin},
+        new Role[]{Role.USER, Role.ADMIN},
         Role.values());
   }
 
   @Test
   void shouldConvertNamesToEnumValues() {
-    assertEquals(Role.user, Role.valueOf("user"));
-    assertEquals(Role.admin, Role.valueOf("admin"));
+    assertEquals(Role.USER, Role.valueOf("user"));
+    assertEquals(Role.ADMIN, Role.valueOf("admin"));
   }
 
   @Test
   void shouldReturnCorrectOrdinals() {
-    assertEquals(0, Role.user.ordinal());
-    assertEquals(1, Role.admin.ordinal());
+    assertEquals(0, Role.USER.ordinal());
+    assertEquals(1, Role.ADMIN.ordinal());
   }
 
   @Test

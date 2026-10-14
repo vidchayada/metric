@@ -33,7 +33,7 @@ class AuthServiceTest {
         .username("alice")
         .email("alice@example.com")
         .passwordHash(password)
-        .role(Role.user)
+        .role(Role.USER)
         .build();
   }
 
