@@ -1,5 +1,5 @@
-TRUNCATE TABLE order_items, orders, product_attributes, product_images,
-    products, categories, users
+TRUNCATE TABLE order_items, orders, cart_items, product_attributes, product_images,
+    products, categories, users, subscribers
     RESTART IDENTITY CASCADE;
 
 INSERT INTO users (full_name, username, email, password_hash, role)
@@ -334,15 +334,15 @@ VALUES
 
 INSERT INTO order_items (order_id, product_id, attribute_id, quantity, unit_price)
 VALUES
-    ((SELECT order_id FROM orders WHERE order_number = '#0001'), 1, 1, 1, 300.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#0002'), 2, 4, 1, 450.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#0003'), 3, 7, 1, 590.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#0004'), 4, 10, 1, 590.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#0005'), 5, 13, 1, 500.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#2026-001'), 49, 133, 1, 1200.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#2026-002'), 39, 103, 1, 850.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#2026-003'), 1, 1, 2, 1050.00),
-    ((SELECT order_id FROM orders WHERE order_number = '#2026-004'), 13, 37, 1, 450.00);
+    ((SELECT order_id FROM orders WHERE order_number = '#0001'), 1, (SELECT attribute_id FROM product_attributes WHERE product_id = 1 LIMIT 1), 1, 300.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#0002'), 2, (SELECT attribute_id FROM product_attributes WHERE product_id = 2 LIMIT 1), 1, 450.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#0003'), 3, (SELECT attribute_id FROM product_attributes WHERE product_id = 3 LIMIT 1), 1, 590.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#0004'), 4, (SELECT attribute_id FROM product_attributes WHERE product_id = 4 LIMIT 1), 1, 590.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#0005'), 5, (SELECT attribute_id FROM product_attributes WHERE product_id = 5 LIMIT 1), 1, 500.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#2026-001'), 49, (SELECT attribute_id FROM product_attributes WHERE product_id = 49 LIMIT 1), 1, 1200.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#2026-002'), 39, (SELECT attribute_id FROM product_attributes WHERE product_id = 39 LIMIT 1), 1, 850.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#2026-003'), 1, (SELECT attribute_id FROM product_attributes WHERE product_id = 1 LIMIT 1), 2, 1050.00),
+    ((SELECT order_id FROM orders WHERE order_number = '#2026-004'), 13, (SELECT attribute_id FROM product_attributes WHERE product_id = 13 LIMIT 1), 1, 450.00);
 
 INSERT INTO product_attributes (product_id, size, color, stock_qty)
 VALUES

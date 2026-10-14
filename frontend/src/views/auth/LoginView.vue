@@ -26,9 +26,15 @@ async function submit() {
   error.value = null
   try {
     const user = await auth.login(username.value.trim(), password.value)
-    if (user.role === 'ADMIN') return router.replace('/admin/dashboard')
+
+    const role = (user.role ?? '').toUpperCase()
+    if (role === 'ADMIN' || auth.isAdmin) {
+      await router.replace('/admin/dashboard')
+      return
+    }
+
     cart.loadCount()
-    router.replace(safeReturnTo())
+    await router.replace(safeReturnTo())
   } catch (e) {
     error.value = statusOf(e) === 401 ? 'Incorrect username or password.' : 'Something went wrong.'
   } finally {

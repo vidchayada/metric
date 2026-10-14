@@ -1,42 +1,53 @@
-# frontend
+# Girlette — Spring Boot + Vue re-engineering (SE262)
 
-This template should help get you started developing with Vue 3 in Vite.
+| Layer | Original | Re-engineered |
+|---|---|---|
+| UI | Bootstrap + custom CSS | Tailwind CSS |
+| Frontend | EJS (server-rendered) | Vue 3 + TypeScript |
+| Backend | Express.js | Spring Boot |
+| Database | MySQL | PostgreSQL |
 
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```
+metric/
+├── backend/                 Spring Boot (Maven)
+├── frontend/                Vue 3 + Vite
+├── pom.xml                  root aggregator: builds backend, runs frontend tests, drives SonarQube
+├── docker-compose.yml       PostgreSQL (+ app, profile "app")
+├── docker-compose.sonar.yml local SonarQube
+└── .github/workflows/ci.yml
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
+## Run locally
+```bash
+cp .env.example .env            # then edit the passwords
+docker compose up -d            # PostgreSQL
+cd backend  && ./mvnw spring-boot:run
+cd frontend && npm install && npm run dev      # http://localhost:5173
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
+## SonarQube (Maven)
+```bash
+docker compose -f docker-compose.sonar.yml up -d     # http://localhost:9000
+# create a project token in SonarQube (My Account > Security), then from the repo root:
+mvn -B verify sonar:sonar -Dsonar.token=<token>
 ```
+One command runs backend tests (JaCoCo), frontend tests (Vitest coverage) and uploads both.
+Skip the frontend step with `-Dskip.npm -Dskip.installnodenpm`.
+
+### Required in `backend/pom.xml`
+The root pom does not configure Java coverage. Add JaCoCo to the backend `<build><plugins>`:
+```xml
+<plugin>
+  <groupId>org.jacoco</groupId>
+  <artifactId>jacoco-maven-plugin</artifactId>
+  <version>0.8.12</version>
+  <executions>
+    <execution><goals><goal>prepare-agent</goal></goals></execution>
+    <execution><id>report</id><phase>verify</phase><goals><goal>report</goal></goals></execution>
+  </executions>
+</plugin>
+```
+
+### GitHub Actions
+Add repository secrets `SONAR_TOKEN` and `SONAR_HOST_URL`. A SonarQube on `localhost` is not reachable from
+GitHub runners; use SonarCloud, a public server, or a self-hosted runner.
