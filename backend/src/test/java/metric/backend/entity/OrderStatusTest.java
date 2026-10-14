@@ -21,11 +21,11 @@ class OrderStatusTest {
 
   @Test
   void shouldConvertNamesToEnumValues() {
-    assertEquals(OrderStatus.PENDING, OrderStatus.valueOf("pending"));
-    assertEquals(OrderStatus.PROCESSING, OrderStatus.valueOf("processing"));
-    assertEquals(OrderStatus.SHIPPED, OrderStatus.valueOf("shipped"));
-    assertEquals(OrderStatus.COMPLETED, OrderStatus.valueOf("completed"));
-    assertEquals(OrderStatus.CANCELLED, OrderStatus.valueOf("cancelled"));
+    assertEquals(OrderStatus.PENDING, OrderStatus.valueOf("PENDING"));
+    assertEquals(OrderStatus.PROCESSING, OrderStatus.valueOf("PROCESSING"));
+    assertEquals(OrderStatus.SHIPPED, OrderStatus.valueOf("SHIPPED"));
+    assertEquals(OrderStatus.COMPLETED, OrderStatus.valueOf("COMPLETED"));
+    assertEquals(OrderStatus.CANCELLED, OrderStatus.valueOf("CANCELLED"));
   }
 
   @Test

@@ -181,20 +181,21 @@ public class AdminProductService {
         return uploadedImages;
     }
 
-    private List<ProductAttribute> processAttributes(Product product, List<CreateProductAttributeRequest> attributeRequests) {
-        List<ProductAttribute> attributes = new ArrayList<>();
+    private List<ProductAttribute> processAttributes(
+        Product product,
+        List<CreateProductAttributeRequest> attributeRequests) {
+
         if (attributeRequests == null || attributeRequests.isEmpty()) {
-            return attributes;
+            return new ArrayList<>();
         }
 
-        for (CreateProductAttributeRequest attrReq : attributeRequests) {
-            attributes.add(ProductAttribute.builder()
-                    .product(product)
-                    .size(attrReq.getSize())
-                    .color(attrReq.getColor())
-                    .stockQty(attrReq.getStockQty())
-                    .build());
-        }
-        return attributes;
+        return attributeRequests.stream()
+            .map(attrReq -> ProductAttribute.builder()
+                .product(product)
+                .size(attrReq.getSize())
+                .color(attrReq.getColor())
+                .stockQty(attrReq.getStockQty())
+                .build())
+            .toList();
     }
 }

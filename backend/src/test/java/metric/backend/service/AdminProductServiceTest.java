@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -64,6 +65,8 @@ class AdminProductServiceTest {
                 .stockQty(10)
                 .build()))
         .build();
+
+    ReflectionTestUtils.setField(service, "entityManager", entityManager);
   }
 
   @Test
@@ -225,17 +228,27 @@ class AdminProductServiceTest {
   void updateProduct_emptyAttributesDeletesOldAttributes() {
     request.setAttributes(List.of());
 
-    when(productRepository.findById(10L)).thenReturn(Optional.of(product));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(productRepository.save(any(Product.class))).thenReturn(product);
-    when(productService.getProductById(10L)).thenReturn(
-        ProductResponse.builder().productId(10L).build());
+    when(productRepository.findById(10L))
+        .thenReturn(Optional.of(product));
+    when(categoryRepository.findById(1L))
+        .thenReturn(Optional.of(category));
+    when(productRepository.save(any(Product.class)))
+        .thenReturn(product);
+    when(productService.getProductById(10L))
+        .thenReturn(ProductResponse.builder()
+            .productId(10L)
+            .build());
 
-    service.updateProduct(10L, request, null);
+    ProductResponse response =
+        service.updateProduct(10L, request, null);
 
-    verify(productAttributeRepository).deleteByProduct_ProductId(10L);
-    verify(productAttributeRepository).saveAll(argThat(list ->
-        ((List<?>) list).isEmpty()));
+    assertNotNull(response);
+
+    verify(productAttributeRepository)
+        .deleteByProduct_ProductId(10L);
+
+    verify(productAttributeRepository, never())
+        .saveAll(anyList());
   }
 
   @Test

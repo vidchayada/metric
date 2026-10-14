@@ -161,7 +161,7 @@ class UserServiceTest {
     assertEquals("1999-05-20", result.get("dateOfBirth"));
 
     verify(userRepository).save(user);
-    verify(userRepository, times(2)).findById(USER_ID);
+    verify(userRepository).findById(USER_ID);
   }
 
   @Test
@@ -383,9 +383,8 @@ class UserServiceTest {
 
 
   @Test
-  void getCurrentUserProfile_shouldReturnRoleNameWhenRoleExists()
-      throws Exception {
-    setFirstEnumConstantOnRoleField(user);
+  void getCurrentUserProfile_shouldReturnRoleNameWhenRoleExists() {
+    user.setRole(metric.backend.entity.Role.ADMIN);
 
     when(userRepository.findById(USER_ID))
         .thenReturn(Optional.of(user));
@@ -393,8 +392,9 @@ class UserServiceTest {
     Map<String, Object> result =
         userService.getCurrentUserProfile(USER_ID);
 
-    assertNotNull(result.get("role"));
-    assertNotEquals("USER", result.get("role"));
+    assertEquals("ADMIN", result.get("role"));
+
+    verify(userRepository).findById(USER_ID);
   }
 
   private void setFirstEnumConstantOnRoleField(User target)

@@ -103,7 +103,7 @@ class UserControllerTest {
 
     var file = new MockMultipartFile(
         "file", "avatar.png", "image/png", new byte[]{1});
-    when(userService.uploadAvatar(eq(1L), eq(file)))
+    when(userService.uploadAvatar((1L), (file)))
         .thenReturn(Map.of("avatarUrl", "/avatar.png"));
 
     var response = controller.uploadAvatar(user, null, file);
@@ -115,7 +115,6 @@ class UserControllerTest {
   @Test
   void uploadAvatarShouldRejectMissingFile() {
     User user = mock(User.class);
-    when(user.getUserId()).thenReturn(1L);
 
     assertThrows(
         IllegalArgumentException.class,
@@ -126,7 +125,6 @@ class UserControllerTest {
   @Test
   void uploadAvatarShouldRejectEmptyFile() {
     User user = mock(User.class);
-    when(user.getUserId()).thenReturn(1L);
 
     var empty = new MockMultipartFile(
         "avatar", "avatar.png", "image/png", new byte[0]);

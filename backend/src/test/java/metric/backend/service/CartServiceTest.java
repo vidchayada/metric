@@ -150,8 +150,11 @@ class CartServiceTest {
   void addToCart_userNotFound() {
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.addToCart(1L, new AddToCartRequest(2L, 3L, 1)));
+    AddToCartRequest request = new AddToCartRequest(2L, 3L, 1);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.addToCart(1L, request));
   }
 
   @Test
@@ -159,18 +162,25 @@ class CartServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(user()));
     when(productRepository.findById(2L)).thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.addToCart(1L, new AddToCartRequest(2L, 3L, 1)));
+    AddToCartRequest request = new AddToCartRequest(2L, 3L, 1);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.addToCart(1L, request));
   }
 
   @Test
   void addToCart_attributeNotFound() {
     when(userRepository.findById(1L)).thenReturn(Optional.of(user()));
     when(productRepository.findById(2L)).thenReturn(Optional.of(product()));
-    when(productAttributeRepository.findById(3L)).thenReturn(Optional.empty());
+    when(productAttributeRepository.findById(3L))
+        .thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.addToCart(1L, new AddToCartRequest(2L, 3L, 1)));
+    AddToCartRequest request = new AddToCartRequest(2L, 3L, 1);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.addToCart(1L, request));
   }
 
   @Test
@@ -180,8 +190,11 @@ class CartServiceTest {
     when(productAttributeRepository.findById(3L))
         .thenReturn(Optional.of(attribute(1)));
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.addToCart(1L, new AddToCartRequest(2L, 3L, 2)));
+    AddToCartRequest request = new AddToCartRequest(2L, 3L, 2);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.addToCart(1L, request));
   }
 
   @Test
@@ -191,11 +204,15 @@ class CartServiceTest {
     when(productAttributeRepository.findById(3L))
         .thenReturn(Optional.of(attribute(3)));
     when(cartItemRepository
-        .findByUser_UserIdAndProduct_ProductIdAndAttribute_AttributeId(1L, 2L, 3L))
+        .findByUser_UserIdAndProduct_ProductIdAndAttribute_AttributeId(
+            1L, 2L, 3L))
         .thenReturn(Optional.of(item(2)));
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.addToCart(1L, new AddToCartRequest(2L, 3L, 2)));
+    AddToCartRequest request = new AddToCartRequest(2L, 3L, 2);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.addToCart(1L, request));
   }
 
   @Test
@@ -214,8 +231,11 @@ class CartServiceTest {
   void updateCartItem_notFound() {
     when(cartItemRepository.findById(4L)).thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.updateCartItem(1L, 4L, new UpdateCartItemRequest(1)));
+    UpdateCartItemRequest request = new UpdateCartItemRequest(1);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.updateCartItem(1L, 4L, request));
   }
 
   @Test
@@ -224,8 +244,11 @@ class CartServiceTest {
     existing.getUser().setUserId(99L);
     when(cartItemRepository.findById(4L)).thenReturn(Optional.of(existing));
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.updateCartItem(1L, 4L, new UpdateCartItemRequest(1)));
+    UpdateCartItemRequest request = new UpdateCartItemRequest(1);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.updateCartItem(1L, 4L, request));
   }
 
   @Test
@@ -234,8 +257,11 @@ class CartServiceTest {
     existing.setAttribute(attribute(1));
     when(cartItemRepository.findById(4L)).thenReturn(Optional.of(existing));
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.updateCartItem(1L, 4L, new UpdateCartItemRequest(2)));
+    UpdateCartItemRequest request = new UpdateCartItemRequest(2);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.updateCartItem(1L, 4L, request));
   }
 
   @Test

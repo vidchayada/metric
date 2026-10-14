@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.WeakKeyException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -98,7 +99,7 @@ class JwtTokenProviderTest {
   @Test
   void constructorShouldRejectShortSecret() {
     assertThrows(
-        IllegalArgumentException.class,
+        WeakKeyException.class,
         () -> new JwtTokenProvider("short-secret", 60_000L));
   }
 

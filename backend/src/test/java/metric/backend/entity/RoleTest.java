@@ -15,8 +15,8 @@ class RoleTest {
 
   @Test
   void shouldConvertNamesToEnumValues() {
-    assertEquals(Role.USER, Role.valueOf("user"));
-    assertEquals(Role.ADMIN, Role.valueOf("admin"));
+    assertEquals(Role.USER, Role.valueOf("USER"));
+    assertEquals(Role.ADMIN, Role.valueOf("ADMIN"));
   }
 
   @Test

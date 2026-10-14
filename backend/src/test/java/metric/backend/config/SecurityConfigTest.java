@@ -38,9 +38,13 @@ class SecurityConfigTest {
 
     HttpSecurity http = mock(HttpSecurity.class, RETURNS_SELF);
 
-    SecurityFilterChain chain = config.securityFilterChain(http);
+    SecurityFilterChain chain = mock(SecurityFilterChain.class);
+    doReturn(chain).when(http).build();
 
-    assertNotNull(chain);
+    SecurityFilterChain result = config.securityFilterChain(http);
+
+    assertNotNull(result);
+    assertSame(chain, result);
     verify(http).build();
   }
 }

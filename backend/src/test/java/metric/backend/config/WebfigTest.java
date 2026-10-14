@@ -1,6 +1,5 @@
 package metric.backend.config;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.nio.file.Paths;

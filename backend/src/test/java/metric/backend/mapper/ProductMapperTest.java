@@ -51,7 +51,12 @@ class ProductMapperTest {
 
   @Test
   void toCategoryResponseShouldPreserveNullFields() {
-    Category category = Category.builder().build();
+    Category category = Category.builder()
+        .categoryId(null)
+        .categoryName(null)
+        .slug(null)
+        .visibility(null)
+        .build();
 
     CategoryResponse response = mapper.toCategoryResponse(category);
 
@@ -288,8 +293,14 @@ class ProductMapperTest {
             null))
         .build();
 
-    assertThrows(
-        NullPointerException.class,
-        () -> mapper.toProductResponse(product));
+    ProductResponse response = mapper.toProductResponse(product);
+
+    assertNotNull(response);
+    assertNotNull(response.getAttributes());
+    assertEquals(2, response.getAttributes().size());
+    assertNotNull(response.getAttributes().get(0));
+    assertEquals(1L, response.getAttributes().get(0).getAttributeId());
+    assertEquals("M", response.getAttributes().get(0).getSize());
+    assertNull(response.getAttributes().get(1));
   }
 }

@@ -42,7 +42,7 @@ class AuthServiceTest {
     when(userRepository.findByUsername("alice"))
         .thenReturn(Optional.of(user("encoded")));
     when(passwordEncoder.matches("secret", "encoded")).thenReturn(true);
-    when(jwtTokenProvider.createToken("alice", "user", 1L))
+    when(jwtTokenProvider.createToken("alice", "USER", 1L))
         .thenReturn("jwt");
 
     AuthResponse response = service.login(
@@ -52,7 +52,7 @@ class AuthServiceTest {
     assertEquals("Bearer", response.getTokenType());
     assertEquals("alice", response.getUsername());
     assertEquals("alice@example.com", response.getEmail());
-    assertEquals("user", response.getRole());
+    assertEquals("USER", response.getRole());
   }
 
   @Test
@@ -60,7 +60,7 @@ class AuthServiceTest {
     when(userRepository.findByUsername("alice"))
         .thenReturn(Optional.of(user("secret")));
     when(passwordEncoder.matches("secret", "secret")).thenReturn(false);
-    when(jwtTokenProvider.createToken("alice", "user", 1L))
+    when(jwtTokenProvider.createToken("alice", "USER", 1L))
         .thenReturn("jwt");
 
     assertEquals("jwt",
@@ -72,8 +72,12 @@ class AuthServiceTest {
     when(userRepository.findByUsername("missing"))
         .thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.login(new LoginRequest("missing", "secret")));
+    LoginRequest request = new LoginRequest("missing", "secret");
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.login(request)
+    );
   }
 
   @Test
@@ -82,8 +86,12 @@ class AuthServiceTest {
         .thenReturn(Optional.of(user("encoded")));
     when(passwordEncoder.matches("wrong", "encoded")).thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class,
-        () -> service.login(new LoginRequest("alice", "wrong")));
+    LoginRequest request = new LoginRequest("alice", "wrong");
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> service.login(request)
+    );
   }
 
   @Test
@@ -96,7 +104,7 @@ class AuthServiceTest {
       saved.setUserId(1L);
       return saved;
     });
-    when(jwtTokenProvider.createToken("alice", "user", 1L))
+      when(jwtTokenProvider.createToken("alice", "USER", 1L))
         .thenReturn("jwt");
 
     AuthResponse response = service.register(

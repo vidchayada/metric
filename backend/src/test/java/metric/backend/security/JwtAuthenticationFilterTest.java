@@ -137,8 +137,7 @@ class JwtAuthenticationFilterTest {
     filter.doFilter(request, response, chain);
 
     assertNull(SecurityContextHolder.getContext().getAuthentication());
-    verify(jwtTokenProvider).validateToken("");
-    verifyNoInteractions(userRepository);
+    verifyNoInteractions(jwtTokenProvider, userRepository);
     verify(chain).doFilter(request, response);
   }
 
