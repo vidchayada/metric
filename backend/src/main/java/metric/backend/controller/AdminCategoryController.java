@@ -2,7 +2,10 @@ package metric.backend.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
+
 import lombok.RequiredArgsConstructor;
 import metric.backend.entity.Category;
 import metric.backend.repository.CategoryRepository;
@@ -18,6 +21,16 @@ public class AdminCategoryController {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
+    private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
+    private static final String VISIBILITY = "visibility";
+
+    private static String toSlug(String name) {
+        String dashed = NON_ALNUM.matcher(name.toLowerCase(Locale.ROOT)).replaceAll("-");
+        int start = dashed.startsWith("-") ? 1 : 0;
+        int end = dashed.length() > start && dashed.endsWith("-") ? dashed.length() - 1 : dashed.length();
+        return dashed.substring(start, end);
+    }
+
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllCategories(
             @RequestParam(required = false) String filter,
@@ -25,10 +38,9 @@ public class AdminCategoryController {
 
         List<Map<String, Object>> response = categoryRepository.findAll().stream()
                 .filter(c -> {
-                    if (filter != null && !filter.trim().isEmpty()) {
-                        if (!filter.equalsIgnoreCase(c.getVisibility())) {
-                            return false;
-                        }
+                    if (filter != null && !filter.trim().isEmpty()
+                            && !filter.equalsIgnoreCase(c.getVisibility())) {
+                        return false;
                     }
 
                     if (search != null && !search.trim().isEmpty()) {
@@ -47,7 +59,7 @@ public class AdminCategoryController {
                     map.put("name", c.getCategoryName());
                     map.put("categoryName", c.getCategoryName());
                     map.put("slug", c.getSlug());
-                    map.put("visibility", c.getVisibility());
+                    map.put(VISIBILITY, c.getVisibility());
 
                     long count = productRepository.findAll().stream()
                             .filter(p -> p.getCategory() != null && catId.equals(p.getCategory().getCategoryId()))
@@ -61,10 +73,10 @@ public class AdminCategoryController {
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Map<String, String> body) {
-        String name = body.get("name") != null ? body.get("name") : body.get("categoryName");
-        String visibility = body.getOrDefault("visibility", "show");
-        String slug = name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
-
+        String nameParam = body.get("name");
+        String name = nameParam != null ? nameParam : body.get("categoryName");
+        String visibility = body.getOrDefault(VISIBILITY, "show");
+        String slug = toSlug(name);
         Category category = Category.builder()
                 .categoryName(name)
                 .slug(slug)
@@ -82,10 +94,10 @@ public class AdminCategoryController {
         if (body.containsKey("name")) {
             String name = body.get("name");
             category.setCategoryName(name);
-            category.setSlug(name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", ""));
+            category.setSlug(toSlug(name));
         }
-        if (body.containsKey("visibility")) {
-            category.setVisibility(body.get("visibility"));
+        if (body.containsKey(VISIBILITY)) {
+            category.setVisibility(body.get(VISIBILITY));
         }
 
         return ResponseEntity.ok(categoryRepository.save(category));
@@ -96,8 +108,8 @@ public class AdminCategoryController {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
 
-        if (body.containsKey("visibility")) {
-            category.setVisibility(body.get("visibility"));
+        if (body.containsKey(VISIBILITY)) {
+            category.setVisibility(body.get(VISIBILITY));
         }
         return ResponseEntity.ok(categoryRepository.save(category));
     }
