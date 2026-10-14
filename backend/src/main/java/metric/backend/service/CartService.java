@@ -33,7 +33,6 @@ public class CartService {
     private final ProductAttributeRepository productAttributeRepository;
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
     public CartResponse getCart(Long userId) {
         List<CartItem> items = cartItemRepository.findByUser_UserId(userId);
         List<CartItemResponse> itemResponses = items.stream().map(this::mapToItemResponse).toList();
