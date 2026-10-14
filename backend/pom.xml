@@ -69,14 +69,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- API: คลาสที่ใช้ตอนเขียนโค้ด (Jwts, Claims, Keys) -->
+        <!-- API: (Jwts, Claims, Keys) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>0.12.6</version>
         </dependency>
 
-        <!-- Implementation: ใช้ตอน runtime -->
+        <!-- Implementation: runtime -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
@@ -84,7 +84,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Jackson: ใช้แปลง JSON ใน token -->
+        <!-- Jackson: แปลง JSON ใน token -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
@@ -121,6 +121,40 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <jvm>/Users/gingerbread/Library/Java/JavaVirtualMachines/ms-21.0.10/Contents/Home/bin/java</jvm>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
