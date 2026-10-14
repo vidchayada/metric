@@ -1,0 +1,105 @@
+package metric.backend.service;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import metric.backend.dto.UpdateProfileRequest;
+import metric.backend.entity.User;
+import metric.backend.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getCurrentUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return mapToUserResponse(user);
+    }
+
+    @Transactional
+    public Map<String, Object> updateProfile(Long userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (request.getFullName() != null && !request.getFullName().isBlank()) {
+            user.setFullName(request.getFullName().trim());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone().trim());
+        }
+        if (request.getAddress() != null) {
+            user.setAddress(request.getAddress().trim());
+        }
+
+        if (request.getDateOfBirth() != null && !request.getDateOfBirth().isBlank()) {
+            try {
+                String dob = request.getDateOfBirth().trim();
+                if (dob.contains("/")) {
+                    user.setDateOfBirth(LocalDate.parse(dob, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                } else {
+                    user.setDateOfBirth(LocalDate.parse(dob));
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        userRepository.save(user);
+        return mapToUserResponse(user);
+    }
+
+    @Transactional
+    public Map<String, Object> uploadAvatar(Long userId, MultipartFile file) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty");
+        }
+
+        try {
+            String contentType = file.getContentType() != null ? file.getContentType() : "image/jpeg";
+            String base64Content = java.util.Base64.getEncoder().encodeToString(file.getBytes());
+            String dataUrl = "data:" + contentType + ";base64," + base64Content;
+
+            user.setProfileImage(dataUrl);
+            userRepository.save(user);
+
+            return mapToUserResponse(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to upload avatar: " + e.getMessage(), e);
+        }
+    }
+
+    private Map<String, Object> mapToUserResponse(User user) {
+        Map<String, Object> res = new HashMap<>();
+        res.put("id", user.getUserId());
+        res.put("userId", user.getUserId());
+        res.put("username", user.getUsername());
+        res.put("email", user.getEmail());
+        res.put("fullName", user.getFullName());
+        res.put("phone", user.getPhone());
+        res.put("address", user.getAddress());
+        res.put("dateOfBirth", user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null);
+        res.put("role", user.getRole() != null ? user.getRole().name() : "USER");
+
+        String avatar = (user.getProfileImage() != null && !user.getProfileImage().isBlank())
+                ? user.getProfileImage()
+                : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400";
+
+        res.put("avatar", avatar);
+        res.put("avatarUrl", avatar);
+        res.put("profileImage", avatar);
+
+        return res;
+    }
+}

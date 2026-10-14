@@ -15,7 +15,7 @@ export const useCartStore = defineStore('cart', () => {
         try {
             const res: any = await cartApi.list()
             const rawList = Array.isArray(res) ? res : (res?.items || [])
-            
+
             const mapped = rawList.map((i: any) => ({
                 id: i.cartItemId ?? i.id,
                 productId: i.productId,

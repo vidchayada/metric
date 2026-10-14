@@ -60,7 +60,7 @@ public class User {
     @Column(name = "address", columnDefinition = "TEXT")
     private String address;
 
-    @Column(name = "profile_image", length = 255)
+    @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
