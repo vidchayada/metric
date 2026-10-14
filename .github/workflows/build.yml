@@ -8,7 +8,29 @@ on:
 jobs:
   build:
     name: Build and analyze
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: girlette
+          POSTGRES_USER: girlette
+          POSTGRES_PASSWORD: ci-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U girlette -d girlette"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/girlette
+      SPRING_DATASOURCE_USERNAME: girlette
+      SPRING_DATASOURCE_PASSWORD: ci-password
+      JWT_SECRET: ci-only-secret-at-least-32-characters-long
+
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
@@ -33,4 +55,8 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=vidchayada_metric
+        run: >
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.projectKey=vidchayada_metric
+          -Dsonar.organization=vidchayada
+          -Dsonar.host.url=https://sonarcloud.io
