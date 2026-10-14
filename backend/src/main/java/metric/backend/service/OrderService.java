@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2026 Vidchayada
- * Licensed under the MIT License.
+- Copyright (c) 2026 Vidchayada
+
+- Licensed under the MIT License.
+
  */
 
 package metric.backend.service;
@@ -60,7 +62,7 @@ public class OrderService {
             totalAmount = totalAmount.add(itemSubtotal);
         }
 
-        String orderNumber = "#ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String orderNumber = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         Order order = Order.builder()
                 .orderNumber(orderNumber)
@@ -155,6 +157,7 @@ public class OrderService {
                 .items(itemResponses)
                 .build();
     }
+
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrdersForAdmin() {
         List<Order> orders = orderRepository.findAllByOrderByOrderDateDesc();
@@ -183,8 +186,8 @@ public class OrderService {
         return orders.stream()
                 .filter(order -> {
                     boolean matchesSearch = (search == null || search.trim().isEmpty()) ||
-                            (order.getOrderNumber() != null && order.getOrderNumber().toLowerCase().contains(search.toLowerCase())) ||
-                            (order.getUser() != null && order.getUser().getFullName() != null && order.getUser().getFullName().toLowerCase().contains(search.toLowerCase()));
+                            ((order.getOrderNumber() != null && order.getOrderNumber().toLowerCase().contains(search.toLowerCase())) ||
+                                    (order.getUser() != null && order.getUser().getFullName() != null && order.getUser().getFullName().toLowerCase().contains(search.toLowerCase())));
 
                     boolean matchesMonth = (month == null) ||
                             (order.getOrderDate() != null && order.getOrderDate().getMonthValue() == month);
@@ -200,5 +203,4 @@ public class OrderService {
                 })
                 .toList();
     }
-
 }

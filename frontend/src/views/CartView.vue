@@ -25,7 +25,7 @@ async function run(action: () => Promise<unknown>) {
 
 const changeQty = (id: number, qty: number) => run(() => cart.setQuantity(id, qty))
 const remove = (id: number) => run(() => cart.remove(id))
-const checkout = () => run(async () => (thanks.value = await cart.checkout()))
+const checkout = () => run(async () => (thanks.value = await cart.checkout('Default Shipping Address')))
 
 onMounted(() => run(() => cart.load()))
 </script>

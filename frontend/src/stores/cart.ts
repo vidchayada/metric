@@ -64,8 +64,8 @@ export const useCartStore = defineStore('cart', () => {
         await load()
     }
 
-    async function checkout() {
-        const res = await cartApi.checkout()
+    async function checkout(shippingAddress?: string) {
+        const res = await cartApi.checkout(shippingAddress)
         items.value = []
         count.value = 0
         return res.orderNumber
