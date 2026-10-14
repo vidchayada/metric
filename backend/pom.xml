@@ -127,9 +127,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
-                <configuration>
-                    <jvm>/Users/gingerbread/Library/Java/JavaVirtualMachines/ms-21.0.10/Contents/Home/bin/java</jvm>
-                </configuration>
             </plugin>
 
             <plugin>
