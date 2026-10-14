@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
 public class CartController {
+
+    private static final String COUNT = "count"; // fix for S1192 (duplicated 3x)
+
     private final CartService cartService;
 
     @GetMapping({"", "/items"})
@@ -36,7 +39,7 @@ public class CartController {
     @GetMapping("/count")
     public ResponseEntity<Map<String, Integer>> getCartCount(@AuthenticationPrincipal User user) {
         if (user == null) {
-            return ResponseEntity.ok(Map.of("count", 0));
+            return ResponseEntity.ok(Map.of(COUNT, 0));
         }
 
         try {
@@ -47,9 +50,9 @@ public class CartController {
                         .mapToInt(item -> item.getQuantity() != null ? item.getQuantity() : 1)
                         .sum();
             }
-            return ResponseEntity.ok(Map.of("count", count));
+            return ResponseEntity.ok(Map.of(COUNT, count));
         } catch (Exception e) {
-            return ResponseEntity.ok(Map.of("count", 0));
+            return ResponseEntity.internalServerError().body(Map.of(COUNT, 0));
         }
     }
 

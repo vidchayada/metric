@@ -10,8 +10,8 @@ CREATE TABLE users (
     address TEXT,
     profile_image VARCHAR(255),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    role VARCHAR(10) NOT NULL DEFAULT 'user'
-       CHECK (role IN ('user', 'admin'))
+    role VARCHAR(10) NOT NULL DEFAULT 'USER'
+       CHECK (role IN ('USER', 'ADMIN'))
 );
 
 CREATE TABLE categories (
@@ -84,8 +84,8 @@ CREATE TABLE orders (
   order_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   shipping_address TEXT NOT NULL,
   total_amount DECIMAL(10,2) NOT NULL,
-  status VARCHAR(12) NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','processing','shipped','completed','cancelled')),
+  status VARCHAR(12) NOT NULL DEFAULT 'PENDING'
+    CHECK (status IN ('PENDING','PROCESSING','SHIPPED','COMPLETED','CANCELLED')),
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_orders_user

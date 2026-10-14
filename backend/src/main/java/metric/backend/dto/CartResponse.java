@@ -23,6 +23,6 @@ public class CartResponse {
     }
 
     public BigDecimal getSubtotal() {
-        return grandTotal;
+        return getTotal();
     }
 }

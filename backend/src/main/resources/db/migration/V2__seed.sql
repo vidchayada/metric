@@ -4,7 +4,7 @@ TRUNCATE TABLE order_items, orders, cart_items, product_attributes, product_imag
 
 INSERT INTO users (full_name, username, email, password_hash, role)
 VALUES ('Admin', 'admin', 'admin@girllette.com',
-        '$2b$12$DuDkwl/CgLDhaWrlDG6B5.xpVN8lv3yNdvYiGuruptj66IKIC84Te', 'admin');
+        '$2b$12$DuDkwl/CgLDhaWrlDG6B5.xpVN8lv3yNdvYiGuruptj66IKIC84Te', 'ADMIN');
 -- plain password for login testing = admin1234 (hashed with BCrypt above)
 
 INSERT INTO categories (category_name, slug, visibility)
@@ -319,19 +319,18 @@ VALUES
 
 INSERT INTO orders (order_number, user_id, shipping_address, total_amount, status, order_date)
 VALUES
-    ('#0001', NULL, '123 Test St', 300.00, 'pending',   '2025-01-20'),
-    ('#0002', NULL, '123 Test St', 450.00, 'pending',   '2025-01-20'),
-    ('#0003', NULL, '123 Test St', 590.00, 'processing','2025-02-10'),
-    ('#0004', NULL, '123 Test St', 590.00, 'shipped',   '2025-02-15'),
-    ('#0005', NULL, '123 Test St', 500.00, 'completed', '2025-03-01'),
-    ('#0006', NULL, '123 Test St', 300.00, 'pending',   '2025-03-05'),
-    ('#0007', NULL, '123 Test St', 450.00, 'cancelled', '2025-03-10'),
-    ('#0008', NULL, '123 Test St', 590.00, 'pending',   '2025-04-01'),
-    ('#2026-001', 1, 'Bangkok, TH', 1200.00, 'completed', '2026-03-05 10:00:00'),
-    ('#2026-002', 1, 'Chiang Mai, TH', 850.00,  'completed', '2026-03-12 14:30:00'),
-    ('#2026-003', 1, 'Phuket, TH', 2100.00, 'completed', '2026-03-20 09:15:00'),
-    ('#2026-004', 1, 'Chonburi, TH', 450.00,  'completed', '2026-03-25 16:00:00');
-
+    ('#0001', NULL, '123 Test St', 300.00, 'PENDING',   '2025-01-20'),
+    ('#0002', NULL, '123 Test St', 450.00, 'PENDING',   '2025-01-20'),
+    ('#0003', NULL, '123 Test St', 590.00, 'PROCESSING','2025-02-10'),
+    ('#0004', NULL, '123 Test St', 590.00, 'SHIPPED',   '2025-02-15'),
+    ('#0005', NULL, '123 Test St', 500.00, 'COMPLETED', '2025-03-01'),
+    ('#0006', NULL, '123 Test St', 300.00, 'PENDING',   '2025-03-05'),
+    ('#0007', NULL, '123 Test St', 450.00, 'CANCELLED', '2025-03-10'),
+    ('#0008', NULL, '123 Test St', 590.00, 'PENDING',   '2025-04-01'),
+    ('#2026-001', 1, 'Bangkok, TH', 1200.00, 'COMPLETED', '2026-03-05 10:00:00'),
+    ('#2026-002', 1, 'Chiang Mai, TH', 850.00,  'COMPLETED', '2026-03-12 14:30:00'),
+    ('#2026-003', 1, 'Phuket, TH', 2100.00, 'COMPLETED', '2026-03-20 09:15:00'),
+    ('#2026-004', 1, 'Chonburi, TH', 450.00,  'COMPLETED', '2026-03-25 16:00:00');
 INSERT INTO order_items (order_id, product_id, attribute_id, quantity, unit_price)
 VALUES
     ((SELECT order_id FROM orders WHERE order_number = '#0001'), 1, (SELECT attribute_id FROM product_attributes WHERE product_id = 1 LIMIT 1), 1, 300.00),

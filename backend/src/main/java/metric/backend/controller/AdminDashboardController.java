@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import metric.backend.entity.Category;
 import metric.backend.entity.Order;
@@ -26,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminDashboardController {
 
+    private static final String CANCELLED = "cancelled";
+
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
@@ -40,12 +41,7 @@ public class AdminDashboardController {
         List<Category> allCategories = categoryRepository.findAll();
         List<Order> allOrders = orderRepository.findAll();
 
-        BigDecimal totalSales = allOrders.stream()
-                .filter(order -> order.getTotalAmount() != null
-                        && !"cancelled".equalsIgnoreCase(String.valueOf(order.getStatus())))
-                .map(Order::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
+        BigDecimal totalSales = calculateTotalSales(allOrders);
         data.put("totalMonth", totalSales);
         data.put("totalWeek", 0);
         data.put("totalSales", totalSales);
@@ -57,13 +53,38 @@ public class AdminDashboardController {
         data.put("totalCategory", allCategories.size());
         data.put("totalCategories", allCategories.size());
 
+        data.put("categories", buildCategoryList(allCategories, allProducts));
+
+        List<Order> sortedOrders = sortOrdersByRecency(allOrders);
+        List<Map<String, Object>> recentOrdersList = buildRecentOrdersList(sortedOrders);
+        data.put("recentOrders", recentOrdersList);
+        data.put("orders", recentOrdersList);
+
+        Map<String, Integer> productSoldMap = calculateProductSoldMap(allOrders);
+        data.put("itemSold", buildItemSoldList(productSoldMap));
+        data.put("popularItems", buildPopularItems(productSoldMap));
+
+        data.put("outOfStock", findOutOfStockProducts(allProducts));
+
+        return ResponseEntity.ok(data);
+    }
+
+    private BigDecimal calculateTotalSales(List<Order> orders) {
+        return orders.stream()
+                .filter(order -> order.getTotalAmount() != null
+                        && !CANCELLED.equalsIgnoreCase(String.valueOf(order.getStatus())))
+                .map(Order::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private List<Map<String, Object>> buildCategoryList(List<Category> categories, List<Product> products) {
         List<Map<String, Object>> categoryList = new ArrayList<>();
-        for (Category cat : allCategories) {
+        for (Category cat : categories) {
             Map<String, Object> catMap = new HashMap<>();
             catMap.put("id", cat.getCategoryId());
             catMap.put("name", cat.getCategoryName());
 
-            List<String> productNames = allProducts.stream()
+            List<String> productNames = products.stream()
                     .filter(p -> p.getCategory() != null && cat.getCategoryId().equals(p.getCategory().getCategoryId()))
                     .map(Product::getProductName)
                     .toList();
@@ -71,69 +92,86 @@ public class AdminDashboardController {
             catMap.put("products", productNames);
             categoryList.add(catMap);
         }
-        data.put("categories", categoryList);
+        return categoryList;
+    }
 
-        List<Map<String, Object>> recentOrdersList = new ArrayList<>();
-        List<Order> sortedOrders = allOrders.stream()
+    private List<Order> sortOrdersByRecency(List<Order> orders) {
+        return orders.stream()
                 .sorted((a, b) -> {
                     if (b.getCreatedAt() != null && a.getCreatedAt() != null) {
                         return b.getCreatedAt().compareTo(a.getCreatedAt());
                     }
-                    return Long.compare(b.getOrderId() != null ? b.getOrderId() : 0L, a.getOrderId() != null ? a.getOrderId() : 0L);
+                    return Long.compare(b.getOrderId() != null ? b.getOrderId() : 0L,
+                            a.getOrderId() != null ? a.getOrderId() : 0L);
                 })
                 .toList();
+    }
 
+    private List<Map<String, Object>> buildRecentOrdersList(List<Order> sortedOrders) {
+        List<Map<String, Object>> recentOrdersList = new ArrayList<>();
         int limit = Math.min(sortedOrders.size(), 5);
         for (int i = 0; i < limit; i++) {
             Order ord = sortedOrders.get(i);
             Map<String, Object> ordMap = new HashMap<>();
-
-            String ordNum = ord.getOrderNumber();
-            if (ordNum == null || ordNum.isEmpty()) {
-                ordNum = ord.getOrderId() != null ? "#" + ord.getOrderId() : "#" + (i + 1);
-            }
-            ordMap.put("number", ordNum);
-
-            String dateStr = "-";
-            if (ord.getCreatedAt() != null) {
-                dateStr = ord.getCreatedAt().toString().substring(0, 10);
-            } else if (ord.getOrderDate() != null) {
-                dateStr = ord.getOrderDate().toString().substring(0, 10);
-            }
-            ordMap.put("date", dateStr);
-
-            String customer = "Guest";
-            if (ord.getUser() != null) {
-                if (ord.getUser().getUsername() != null && !ord.getUser().getUsername().isEmpty()) {
-                    customer = ord.getUser().getUsername();
-                } else if (ord.getUser().getEmail() != null && !ord.getUser().getEmail().isEmpty()) {
-                    customer = ord.getUser().getEmail();
-                } else if (ord.getUser().getFullName() != null && !ord.getUser().getFullName().isEmpty()) {
-                    customer = ord.getUser().getFullName();
-                }
-            }
-            ordMap.put("customer", customer);
-
+            ordMap.put("number", resolveOrderNumber(ord, i));
+            ordMap.put("date", resolveOrderDate(ord));
+            ordMap.put("customer", resolveCustomerName(ord));
             recentOrdersList.add(ordMap);
         }
-        data.put("recentOrders", recentOrdersList);
-        data.put("orders", recentOrdersList);
+        return recentOrdersList;
+    }
 
+    private String resolveOrderNumber(Order ord, int fallbackIndex) {
+        String ordNum = ord.getOrderNumber();
+        if (ordNum == null || ordNum.isEmpty()) {
+            return ord.getOrderId() != null ? "#" + ord.getOrderId() : "#" + (fallbackIndex + 1);
+        }
+        return ordNum;
+    }
+
+    private String resolveOrderDate(Order ord) {
+        if (ord.getCreatedAt() != null) {
+            return ord.getCreatedAt().toString().substring(0, 10);
+        }
+        if (ord.getOrderDate() != null) {
+            return ord.getOrderDate().toString().substring(0, 10);
+        }
+        return "-";
+    }
+
+    private String resolveCustomerName(Order ord) {
+        if (ord.getUser() == null) {
+            return "Guest";
+        }
+        if (ord.getUser().getUsername() != null && !ord.getUser().getUsername().isEmpty()) {
+            return ord.getUser().getUsername();
+        }
+        if (ord.getUser().getEmail() != null && !ord.getUser().getEmail().isEmpty()) {
+            return ord.getUser().getEmail();
+        }
+        if (ord.getUser().getFullName() != null && !ord.getUser().getFullName().isEmpty()) {
+            return ord.getUser().getFullName();
+        }
+        return "Guest";
+    }
+
+    private Map<String, Integer> calculateProductSoldMap(List<Order> orders) {
         Map<String, Integer> productSoldMap = new HashMap<>();
-        int totalItemsSold = 0;
-
-        for (Order ord : allOrders) {
-            if (!"cancelled".equalsIgnoreCase(String.valueOf(ord.getStatus())) && ord.getOrderItems() != null) {
-                for (OrderItem item : ord.getOrderItems()) {
-                    totalItemsSold += item.getQuantity();
-                    if (item.getProduct() != null) {
-                        String pName = item.getProduct().getProductName();
-                        productSoldMap.put(pName, productSoldMap.getOrDefault(pName, 0) + item.getQuantity());
-                    }
+        for (Order ord : orders) {
+            if (CANCELLED.equalsIgnoreCase(String.valueOf(ord.getStatus())) || ord.getOrderItems() == null) {
+                continue;
+            }
+            for (OrderItem item : ord.getOrderItems()) {
+                if (item.getProduct() != null) {
+                    String pName = item.getProduct().getProductName();
+                    productSoldMap.put(pName, productSoldMap.getOrDefault(pName, 0) + item.getQuantity());
                 }
             }
         }
+        return productSoldMap;
+    }
 
+    private List<Map<String, Object>> buildItemSoldList(Map<String, Integer> productSoldMap) {
         List<Map<String, Object>> itemSoldList = new ArrayList<>();
         productSoldMap.forEach((name, qty) -> {
             Map<String, Object> map = new HashMap<>();
@@ -141,9 +179,11 @@ public class AdminDashboardController {
             map.put("quantity", qty);
             itemSoldList.add(map);
         });
-        data.put("itemSold", itemSoldList);
+        return itemSoldList;
+    }
 
-        List<Map<String, Object>> popularItems = productSoldMap.entrySet().stream()
+    private List<Map<String, Object>> buildPopularItems(Map<String, Integer> productSoldMap) {
+        return productSoldMap.entrySet().stream()
                 .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
                 .limit(5)
                 .map(entry -> {
@@ -153,10 +193,11 @@ public class AdminDashboardController {
                     return m;
                 })
                 .toList();
-        data.put("popularItems", popularItems);
+    }
 
+    private List<String> findOutOfStockProducts(List<Product> products) {
         List<String> outOfStockProducts = new ArrayList<>();
-        for (Product p : allProducts) {
+        for (Product p : products) {
             var attrs = productAttributeRepository.findByProduct_ProductId(p.getProductId());
             int totalStock = 0;
             if (attrs != null && !attrs.isEmpty()) {
@@ -168,8 +209,6 @@ public class AdminDashboardController {
                 outOfStockProducts.add(p.getProductName());
             }
         }
-        data.put("outOfStock", outOfStockProducts);
-
-        return ResponseEntity.ok(data);
+        return outOfStockProducts;
     }
 }
