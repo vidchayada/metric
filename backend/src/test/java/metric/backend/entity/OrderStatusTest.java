@@ -10,31 +10,31 @@ class OrderStatusTest {
   void shouldContainAllExpectedStatuses() {
     assertArrayEquals(
         new OrderStatus[]{
-            OrderStatus.pending,
-            OrderStatus.processing,
-            OrderStatus.shipped,
-            OrderStatus.completed,
-            OrderStatus.cancelled
+            OrderStatus.PENDING,
+            OrderStatus.PROCESSING,
+            OrderStatus.SHIPPED,
+            OrderStatus.COMPLETED,
+            OrderStatus.CANCELLED,
         },
         OrderStatus.values());
   }
 
   @Test
   void shouldConvertNamesToEnumValues() {
-    assertEquals(OrderStatus.pending, OrderStatus.valueOf("pending"));
-    assertEquals(OrderStatus.processing, OrderStatus.valueOf("processing"));
-    assertEquals(OrderStatus.shipped, OrderStatus.valueOf("shipped"));
-    assertEquals(OrderStatus.completed, OrderStatus.valueOf("completed"));
-    assertEquals(OrderStatus.cancelled, OrderStatus.valueOf("cancelled"));
+    assertEquals(OrderStatus.PENDING, OrderStatus.valueOf("pending"));
+    assertEquals(OrderStatus.PROCESSING, OrderStatus.valueOf("processing"));
+    assertEquals(OrderStatus.SHIPPED, OrderStatus.valueOf("shipped"));
+    assertEquals(OrderStatus.COMPLETED, OrderStatus.valueOf("completed"));
+    assertEquals(OrderStatus.CANCELLED, OrderStatus.valueOf("cancelled"));
   }
 
   @Test
   void shouldReturnCorrectOrdinals() {
-    assertEquals(0, OrderStatus.pending.ordinal());
-    assertEquals(1, OrderStatus.processing.ordinal());
-    assertEquals(2, OrderStatus.shipped.ordinal());
-    assertEquals(3, OrderStatus.completed.ordinal());
-    assertEquals(4, OrderStatus.cancelled.ordinal());
+    assertEquals(0, OrderStatus.PENDING.ordinal());
+    assertEquals(1, OrderStatus.PROCESSING.ordinal());
+    assertEquals(2, OrderStatus.SHIPPED.ordinal());
+    assertEquals(3, OrderStatus.COMPLETED.ordinal());
+    assertEquals(4, OrderStatus.CANCELLED.ordinal());
   }
 
   @Test
