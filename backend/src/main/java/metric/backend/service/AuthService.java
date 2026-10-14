@@ -8,6 +8,7 @@ package metric.backend.service;
 import lombok.RequiredArgsConstructor;
 import metric.backend.dto.AuthResponse;
 import metric.backend.dto.LoginRequest;
+import metric.backend.entity.Role;
 import metric.backend.entity.User;
 import metric.backend.repository.UserRepository;
 import metric.backend.security.JwtTokenProvider;
@@ -48,6 +49,38 @@ public class AuthService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .build();
+    }
+
+    @Transactional
+    public AuthResponse register(String username, String email, String password) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        User newUser = User.builder()
+                .username(username)
+                .fullName(username)
+                .email(email)
+                .passwordHash(passwordEncoder.encode(password))
+                .role(Role.user)
+                .build();
+
+        User savedUser = userRepository.save(newUser);
+
+        String token = jwtTokenProvider.createToken(
+                savedUser.getUsername(),
+                savedUser.getRole().name(),
+                savedUser.getUserId()
+        );
+
+        return AuthResponse.builder()
+                .token(token)
+                .tokenType("Bearer")
+                .userId(savedUser.getUserId())
+                .username(savedUser.getUsername())
+                .email(savedUser.getEmail())
+                .role(savedUser.getRole().name())
                 .build();
     }
 }

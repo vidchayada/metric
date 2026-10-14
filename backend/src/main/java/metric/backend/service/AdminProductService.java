@@ -1,14 +1,16 @@
-/*
- * Copyright (c) 2026 Vidchayada
- * Licensed under the MIT License.
- */
-
 package metric.backend.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import metric.backend.dto.CreateProductAttributeRequest;
 import metric.backend.dto.CreateProductRequest;
@@ -23,6 +25,7 @@ import metric.backend.repository.ProductImageRepository;
 import metric.backend.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +40,7 @@ public class AdminProductService {
     private EntityManager entityManager;
 
     @Transactional
-    public ProductResponse createProduct(CreateProductRequest request) {
+    public ProductResponse createProduct(CreateProductRequest request, List<MultipartFile> files) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + request.getCategoryId()));
 
@@ -50,8 +53,9 @@ public class AdminProductService {
 
         Product savedProduct = productRepository.save(product);
 
+        List<ProductImage> images = new ArrayList<>();
+
         if (request.getImageUrls() != null && !request.getImageUrls().isEmpty()) {
-            List<ProductImage> images = new ArrayList<>();
             for (int i = 0; i < request.getImageUrls().size(); i++) {
                 images.add(ProductImage.builder()
                         .product(savedProduct)
@@ -59,6 +63,40 @@ public class AdminProductService {
                         .isPrimary(i == 0)
                         .build());
             }
+        }
+
+        if (files != null && !files.isEmpty()) {
+            String uploadDir = "uploads/products/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            for (int i = 0; i < files.size(); i++) {
+                MultipartFile file = files.get(i);
+                if (file.isEmpty()) continue;
+
+                String originalName = file.getOriginalFilename();
+                String ext = (originalName != null && originalName.contains("."))
+                        ? originalName.substring(originalName.lastIndexOf("."))
+                        : ".jpg";
+                String savedName = UUID.randomUUID().toString() + ext;
+                Path targetLocation = Paths.get(uploadDir).resolve(savedName);
+
+                try {
+                    Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+                    images.add(ProductImage.builder()
+                            .product(savedProduct)
+                            .imageUrl("/image/products/" + savedName)
+                            .isPrimary(images.isEmpty()) // ให้รูปแรกเป็น primary
+                            .build());
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to store file " + originalName, e);
+                }
+            }
+        }
+
+        if (!images.isEmpty()) {
             productImageRepository.saveAll(images);
         }
 
@@ -82,7 +120,7 @@ public class AdminProductService {
     }
 
     @Transactional
-    public ProductResponse updateProduct(Long productId, CreateProductRequest request) {
+    public ProductResponse updateProduct(Long productId, CreateProductRequest request, List<MultipartFile> files) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
 
@@ -96,17 +134,47 @@ public class AdminProductService {
 
         productRepository.save(product);
 
-        if (request.getImageUrls() != null) {
+        if ((request.getImageUrls() != null && !request.getImageUrls().isEmpty()) || (files != null && !files.isEmpty())) {
             productImageRepository.deleteByProduct_ProductId(productId);
             List<ProductImage> newImages = new ArrayList<>();
-            for (int i = 0; i < request.getImageUrls().size(); i++) {
-                newImages.add(ProductImage.builder()
-                        .product(product)
-                        .imageUrl(request.getImageUrls().get(i))
-                        .isPrimary(i == 0)
-                        .build());
+
+            if (request.getImageUrls() != null) {
+                for (int i = 0; i < request.getImageUrls().size(); i++) {
+                    newImages.add(ProductImage.builder()
+                            .product(product)
+                            .imageUrl(request.getImageUrls().get(i))
+                            .isPrimary(i == 0)
+                            .build());
+                }
             }
-            productImageRepository.saveAll(newImages);
+
+            if (files != null && !files.isEmpty()) {
+                String uploadDir = "uploads/products/";
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+
+                for (MultipartFile file : files) {
+                    if (file.isEmpty()) continue;
+                    String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
+                            ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."))
+                            : ".jpg";
+                    String savedName = UUID.randomUUID().toString() + ext;
+                    try {
+                        Files.copy(file.getInputStream(), Paths.get(uploadDir).resolve(savedName), StandardCopyOption.REPLACE_EXISTING);
+                        newImages.add(ProductImage.builder()
+                                .product(product)
+                                .imageUrl("/image/products/" + savedName)
+                                .isPrimary(newImages.isEmpty())
+                                .build());
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to store file", e);
+                    }
+                }
+            }
+
+            if (!newImages.isEmpty()) {
+                productImageRepository.saveAll(newImages);
+            }
         }
 
         if (request.getAttributes() != null) {

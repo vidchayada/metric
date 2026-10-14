@@ -50,7 +50,8 @@ export const cartApi = {
         http.post('/cart/items', { productId, attributeId, quantity }),
     setQuantity: (id: number, quantity: number) => http.patch(`/cart/items/${id}`, { quantity }),
     remove: (id: number) => http.delete(`/cart/items/${id}`),
-    checkout: () => http.post<{ orderNumber: string }>('/cart/checkout').then((r) => r.data),
+    checkout: (shippingAddress: string = 'Default Address') =>
+        http.post<{ orderNumber: string }>('/orders/checkout', { shippingAddress }).then((r) => r.data),
 }
 
 export const contactApi = {

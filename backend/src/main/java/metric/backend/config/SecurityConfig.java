@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2026 Vidchayada
- * Licensed under the MIT License.
+- Copyright (c) 2026 Vidchayada
+
+- Licensed under the MIT License.
+
  */
 
 package metric.backend.config;
@@ -36,10 +38,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -52,10 +54,20 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
-                        .requestMatchers("/api/subscribers/**").permitAll()
-                        .requestMatchers("/api/cart/**").authenticated()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/products/**",
+                                "/api/categories/**",
+                                "/api/home/**",
+                                "/image/**",
+                                "/images/**",
+                                "/uploads/**",
+                                "/static/**"
+                        ).permitAll()
+                        .requestMatchers("/image/**", "/images/**", "/uploads/**", "/api/subscribers/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/cart/**", "/api/orders/**", "/api/auth/me").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
