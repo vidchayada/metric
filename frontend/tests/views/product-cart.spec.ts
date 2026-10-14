@@ -49,15 +49,20 @@ describe('ProductDetailView', () => {
 
   it('shows the product, uses the primary image first and lists sizes of the first colour', async () => {
     shopApiMock.catalogApi.product.mockResolvedValue(detail)
+
     const { wrapper } = await open()
+    await settle()
+
     const text = wrapper.text()
+
     expect(text).toContain('Linen Shirt')
     expect(text).toContain('฿1,250')
     expect(text).toContain('Soft and airy')
     expect(text).toContain('Tops')
+
     expect(wrapper.find('img').attributes('src')).toBe('/uploads/b.jpg')
     expect(shopApiMock.catalogApi.product).toHaveBeenCalledWith(7)
-    expect(sizeButton(wrapper, 'S').attributes('disabled')).toBeDefined() // out of stock for Beige
+    expect(sizeButton(wrapper, 'S').attributes('disabled')).toBeDefined()
     expect(sizeButton(wrapper, 'M').attributes('disabled')).toBeUndefined()
   })
 
@@ -244,8 +249,11 @@ describe('CartView', () => {
   })
 
   it('reports a failed load as a toast', async () => {
-    shopApiMock.cartApi.list.mockRejectedValue(axiosErr(500, { message: 'Cart unavailable' }))
+    shopApiMock.cartApi.list.mockRejectedValue(
+        axiosErr(500, { message: 'Cart unavailable' }),
+    )
     const { pinia } = await open()
+    await settle()
     expect(lastToast(pinia)?.message).toBe('Cart unavailable')
   })
 })

@@ -25,16 +25,22 @@ export const useCartStore = defineStore('cart', () => {
                 image: i.imageUrl ?? i.image ?? '',
                 size: i.size,
                 color: i.color,
-                subtotal: Number(i.subtotal ?? ((i.unitPrice ?? i.price ?? 0) * i.quantity))
+                subtotal: Number(
+                    i.subtotal ?? ((i.unitPrice ?? i.price ?? 0) * i.quantity)
+                ),
             }))
 
             items.value = mapped.sort((a: any, b: any) => a.id - b.id)
 
-            count.value = items.value.reduce((sum: number, i: any) => sum + i.quantity, 0)
+            count.value = items.value.reduce(
+                (sum: number, i: any) => sum + i.quantity,
+                0,
+            )
         } catch (e) {
             console.error('Failed to load cart', e)
             items.value = []
             count.value = 0
+            throw e
         } finally {
             loading.value = false
         }

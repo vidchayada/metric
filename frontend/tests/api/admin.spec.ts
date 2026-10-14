@@ -29,8 +29,8 @@ describe('admin api', () => {
 
   it('updates an order status', async () => {
     const patch = vi.spyOn(http, 'patch').mockResolvedValue(reply(null))
-    await adminApi.updateOrderStatus(5, 'shipped')
-    expect(patch).toHaveBeenCalledWith('/admin/orders/5/status', { status: 'shipped' })
+    await adminApi.updateOrderStatus(5, 'SHIPPED')
+    expect(patch).toHaveBeenCalledWith('/admin/orders/5/status', { status: 'SHIPPED' })
   })
 
   it('manages categories', async () => {

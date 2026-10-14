@@ -36,9 +36,20 @@ function getTotalStock(p: any): number {
 
 async function load() {
   loading.value = true
+
   try {
-    products.value = await adminApi.products(categoryFilter.value, search.value.trim())
+    const res = await adminApi.products(
+        categoryFilter.value,
+        search.value.trim(),
+    )
+
+    products.value = Array.isArray(res)
+        ? res
+        : Array.isArray((res as any)?.items)
+            ? (res as any).items
+            : []
   } catch (e) {
+    products.value = []
     toast.error(apiError(e, 'Could not load products.'))
   } finally {
     loading.value = false
@@ -68,16 +79,14 @@ function onSearchInput() {
 
 function openCreate() {
   editingId.value = null
-  const defaultCat = categories.value.length
-      ? ((categories.value[0] as any).categoryId ?? (categories.value[0] as any).id ?? '')
-      : ''
 
   Object.assign(form, {
-    categoryId: defaultCat,
+    categoryId: '',
     name: '',
     detail: '',
     price: 0,
   })
+
   attributes.value = [emptyRow()]
   images.value = []
   modalOpen.value = true
@@ -116,15 +125,16 @@ function removeRow(i: number) {
 const onFiles = (e: Event) => (images.value = Array.from((e.target as HTMLInputElement).files ?? []))
 
 async function save() {
-  if (form.categoryId === '') return toast.error('Please select a category.')
+  if (form.categoryId === '') {
+    toast.error('Please select a category.')
+    return
+  }
+
   saving.value = true
 
   const payload = {
-    productName: form.name.trim(),
     name: form.name.trim(),
-    description: form.detail.trim(),
     detail: form.detail.trim(),
-    basePrice: Number(form.price) || 0,
     price: Number(form.price) || 0,
     categoryId: Number(form.categoryId),
     attributes: attributes.value
@@ -138,9 +148,9 @@ async function save() {
 
   try {
     if (editingId.value === null) {
-      await adminApi.createProduct(payload as any, images.value)
+      await adminApi.createProduct(payload, images.value)
     } else {
-      await adminApi.updateProduct(editingId.value, payload as any, images.value)
+      await adminApi.updateProduct(editingId.value, payload, images.value)
     }
     toast.success(editingId.value === null ? 'Product created' : 'Product updated')
     modalOpen.value = false

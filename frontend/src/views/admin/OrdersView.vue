@@ -8,6 +8,8 @@ import AppPagination from '@/components/common/AppPagination.vue'
 import { MONTHS } from '@/utils/format'
 import { ORDER_STATUSES, type AdminOrder, type OrderStatus } from '@/types'
 
+const selectedStatus = ref('')
+
 const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
@@ -41,12 +43,22 @@ async function load() {
   }
 }
 
-function setFilter(key: 'search' | 'month' | 'status', value: string) {
-  router.push({ query: { ...route.query, [key]: value || undefined, page: undefined } })
+function setFilter(
+    key: 'search' | 'month' | 'status',
+    value: string,
+) {
+  router.push({
+    query: {
+      ...route.query,
+      [key]: value || undefined,
+      page: undefined,
+    },
+  })
 }
 const goTo = (p: number) => router.push({ query: { ...route.query, page: p } })
 
 async function changeStatus(order: AdminOrder, next: OrderStatus) {
+  console.log('changeStatus:', next)
   const targetId = (order as any).id ?? (order as any).orderId
   if (!targetId) {
     toast.error('Order ID not found')
@@ -88,7 +100,12 @@ onMounted(load)
       </div>
       <div>
         <label for="status" class="field-label">Status</label>
-        <select id="status" class="field" :value="status" @change="setFilter('status', ($event.target as HTMLSelectElement).value)">
+        <select
+            id="status"
+            class="field"
+            :value="status"
+            @change="setFilter('status', String(($event.target as HTMLSelectElement).value))"
+        >
           <option value="">All</option>
           <option v-for="s in ORDER_STATUSES" :key="s" :value="s">{{ s }}</option>
         </select>
