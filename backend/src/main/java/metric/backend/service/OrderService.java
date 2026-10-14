@@ -7,6 +7,7 @@
 
 package metric.backend.service;
 
+import java.time.ZoneId;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -69,8 +70,8 @@ public class OrderService {
                 .user(user)
                 .shippingAddress(request.getShippingAddress())
                 .totalAmount(totalAmount)
-                .status(OrderStatus.pending)
-                .orderDate(OffsetDateTime.now())
+                .status(OrderStatus.PENDING)
+                .orderDate(OffsetDateTime.now(ZoneId.systemDefault()))
                 .build();
 
         Order savedOrder = orderRepository.save(order);

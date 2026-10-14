@@ -66,7 +66,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 10)
     @Builder.Default
-    private Role role = Role.user;
+    private Role role = Role.USER;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

@@ -63,7 +63,7 @@ public class AuthService {
                 .fullName(username)
                 .email(email)
                 .passwordHash(passwordEncoder.encode(password))
-                .role(Role.user)
+                .role(Role.USER)
                 .build();
 
         User savedUser = userRepository.save(newUser);
