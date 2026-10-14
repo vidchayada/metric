@@ -41,7 +41,15 @@ export const useAuthStore = defineStore('auth', () => {
         if (!token.value) return
         try {
             const data: any = await authApi.me()
-            user.value = data.user ?? data
+            const rawUser = data.user ?? data
+            const img = rawUser.profileImage ?? rawUser.avatar ?? rawUser.avatarUrl ?? ''
+
+            user.value = {
+                ...rawUser,
+                profileImage: img,
+                avatar: img,
+                avatarUrl: img
+            }
         } catch {
             logout()
         }

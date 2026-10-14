@@ -28,32 +28,23 @@ public class UserService {
     @Transactional
     public Map<String, Object> updateProfile(Long userId, UpdateProfileRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        if (request.getFullName() != null && !request.getFullName().isBlank()) {
-            user.setFullName(request.getFullName().trim());
+        if (request.getFullName() != null) {
+            user.setFullName(request.getFullName());
         }
         if (request.getPhone() != null) {
-            user.setPhone(request.getPhone().trim());
+            user.setPhone(request.getPhone());
         }
         if (request.getAddress() != null) {
-            user.setAddress(request.getAddress().trim());
+            user.setAddress(request.getAddress());
+        }
+        if (request.getDateOfBirth() != null && !request.getDateOfBirth().isEmpty()) {
+            user.setDateOfBirth(java.time.LocalDate.parse(request.getDateOfBirth()));
         }
 
-        if (request.getDateOfBirth() != null && !request.getDateOfBirth().isBlank()) {
-            try {
-                String dob = request.getDateOfBirth().trim();
-                if (dob.contains("/")) {
-                    user.setDateOfBirth(LocalDate.parse(dob, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                } else {
-                    user.setDateOfBirth(LocalDate.parse(dob));
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
-        userRepository.save(user);
-        return mapToUserResponse(user);
+        User savedUser = userRepository.save(user);
+        return getCurrentUserProfile(savedUser.getUserId());
     }
 
     @Transactional

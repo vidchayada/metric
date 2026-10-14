@@ -63,8 +63,13 @@ async function onAvatar(event: Event) {
   if (!file) return
   if (!ALLOWED_TYPES.includes(file.type)) return toast.error('Please choose a JPEG, PNG or WebP image.')
   if (file.size > MAX_AVATAR_BYTES) return toast.error('Image must be 5 MB or smaller.')
+
   try {
-    auth.setUser(await userApi.uploadAvatar(file))
+    const res: any = await userApi.uploadAvatar(file)
+    if (auth.user) {
+      auth.user.profileImage = res.profileImage ?? res.avatar ?? res.avatarUrl
+    }
+
     toast.success('Photo updated')
   } catch (e) {
     toast.error(apiError(e))
