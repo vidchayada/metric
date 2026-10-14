@@ -1,18 +1,49 @@
-version: "3.8"
-
+# docker compose up -d                    -> PostgreSQL only (run backend/frontend from the IDE)
+# docker compose --profile app up -d --build  -> whole stack (needs backend/Dockerfile and frontend/Dockerfile)
 services:
   postgres:
-    image: postgres:16-alpine
-    container_name: metric-postgres
-    restart: always
+    image: postgres:17-alpine
+    container_name: girlette-db
     environment:
-      POSTGRES_DB: girllette
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB:-girlette}
+      POSTGRES_USER: ${POSTGRES_USER:-girlette}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    profiles: ["app"]
+    build: ./backend
+    container_name: girlette-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-girlette}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-girlette}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/uploads
+
+  frontend:
+    profiles: ["app"]
+    build: ./frontend
+    container_name: girlette-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
 
 volumes:
-  postgres_data:
+  pgdata:
+  uploads:
