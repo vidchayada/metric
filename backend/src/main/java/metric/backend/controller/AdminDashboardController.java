@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2026 Vidchayada
- * Licensed under the MIT License.
- */
-
 package metric.backend.controller;
 
 import java.math.BigDecimal;
@@ -10,9 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import metric.backend.entity.Category;
 import metric.backend.entity.Order;
+import metric.backend.entity.OrderItem;
 import metric.backend.entity.Product;
 import metric.backend.repository.CategoryRepository;
 import metric.backend.repository.OrderRepository;
@@ -77,23 +74,86 @@ public class AdminDashboardController {
         data.put("categories", categoryList);
 
         List<Map<String, Object>> recentOrdersList = new ArrayList<>();
-        int limit = Math.min(allOrders.size(), 5);
-        for (int i = 0; i < limit; i++) {
-            Order ord = allOrders.get(i);
-            Map<String, Object> ordMap = new HashMap<>();
-            ordMap.put("number", ord.getOrderId() != null ? "#" + ord.getOrderId() : "#" + (i + 1));
-            ordMap.put("date", ord.getCreatedAt() != null ? ord.getCreatedAt().toString().substring(0, 10) : "-");
+        List<Order> sortedOrders = allOrders.stream()
+                .sorted((a, b) -> {
+                    if (b.getCreatedAt() != null && a.getCreatedAt() != null) {
+                        return b.getCreatedAt().compareTo(a.getCreatedAt());
+                    }
+                    return Long.compare(b.getOrderId() != null ? b.getOrderId() : 0L, a.getOrderId() != null ? a.getOrderId() : 0L);
+                })
+                .toList();
 
-            String customer = "—";
+        int limit = Math.min(sortedOrders.size(), 5);
+        for (int i = 0; i < limit; i++) {
+            Order ord = sortedOrders.get(i);
+            Map<String, Object> ordMap = new HashMap<>();
+
+            String ordNum = ord.getOrderNumber();
+            if (ordNum == null || ordNum.isEmpty()) {
+                ordNum = ord.getOrderId() != null ? "#" + ord.getOrderId() : "#" + (i + 1);
+            }
+            ordMap.put("number", ordNum);
+
+            String dateStr = "-";
+            if (ord.getCreatedAt() != null) {
+                dateStr = ord.getCreatedAt().toString().substring(0, 10);
+            } else if (ord.getOrderDate() != null) {
+                dateStr = ord.getOrderDate().toString().substring(0, 10);
+            }
+            ordMap.put("date", dateStr);
+
+            String customer = "Guest";
             if (ord.getUser() != null) {
-                customer = ord.getUser().getUsername() != null ? ord.getUser().getUsername() : ord.getUser().getEmail();
+                if (ord.getUser().getUsername() != null && !ord.getUser().getUsername().isEmpty()) {
+                    customer = ord.getUser().getUsername();
+                } else if (ord.getUser().getEmail() != null && !ord.getUser().getEmail().isEmpty()) {
+                    customer = ord.getUser().getEmail();
+                } else if (ord.getUser().getFullName() != null && !ord.getUser().getFullName().isEmpty()) {
+                    customer = ord.getUser().getFullName();
+                }
             }
             ordMap.put("customer", customer);
+
             recentOrdersList.add(ordMap);
         }
         data.put("recentOrders", recentOrdersList);
         data.put("orders", recentOrdersList);
-        data.put("itemSold", new ArrayList<>());
+
+        Map<String, Integer> productSoldMap = new HashMap<>();
+        int totalItemsSold = 0;
+
+        for (Order ord : allOrders) {
+            if (!"cancelled".equalsIgnoreCase(String.valueOf(ord.getStatus())) && ord.getOrderItems() != null) {
+                for (OrderItem item : ord.getOrderItems()) {
+                    totalItemsSold += item.getQuantity();
+                    if (item.getProduct() != null) {
+                        String pName = item.getProduct().getProductName();
+                        productSoldMap.put(pName, productSoldMap.getOrDefault(pName, 0) + item.getQuantity());
+                    }
+                }
+            }
+        }
+
+        List<Map<String, Object>> itemSoldList = new ArrayList<>();
+        productSoldMap.forEach((name, qty) -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", name);
+            map.put("quantity", qty);
+            itemSoldList.add(map);
+        });
+        data.put("itemSold", itemSoldList);
+
+        List<Map<String, Object>> popularItems = productSoldMap.entrySet().stream()
+                .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
+                .limit(5)
+                .map(entry -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("name", entry.getKey());
+                    m.put("sold", entry.getValue());
+                    return m;
+                })
+                .toList();
+        data.put("popularItems", popularItems);
 
         List<String> outOfStockProducts = new ArrayList<>();
         for (Product p : allProducts) {
