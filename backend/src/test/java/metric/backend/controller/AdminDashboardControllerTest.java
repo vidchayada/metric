@@ -67,8 +67,6 @@ class AdminDashboardControllerTest {
     Order cancelled = mock(Order.class);
     when(cancelled.getTotalAmount()).thenReturn(new BigDecimal("50.00"));
     when(cancelled.getStatus()).thenReturn(null);
-    // กรณีนี้ควรตั้ง status ของ cancelled ให้ตรงกับ enum/string
-    // ที่ production code แปลงเป็น "cancelled"
 
     when(productRepository.findAll()).thenReturn(List.of());
     when(categoryRepository.findAll()).thenReturn(List.of());

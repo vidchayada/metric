@@ -12,22 +12,18 @@ const toast = useToastStore()
 const busy = ref(false)
 const thanks = ref<string | null>(null)
 
-async function run(action: () => Promise<unknown>) {
-  busy.value = true
-  try {
-    await action()
-  } catch (e) {
-    toast.error(apiError(e))
-  } finally {
-    busy.value = false
-  }
-}
+async function run( action: () => Promise<unknown>, fallback = 'Something went wrong.', ) { busy.value = true
 
-const changeQty = (id: number, qty: number) => run(() => cart.setQuantity(id, qty))
-const remove = (id: number) => run(() => cart.remove(id))
-const checkout = () => run(async () => (thanks.value = await cart.checkout('Default Shipping Address')))
+  try { await action() } catch (e: unknown) { toast.error(apiError(e, fallback)) } finally { busy.value = false } }
 
-onMounted(() => run(() => cart.load()))
+const changeQty = (id: number, qty: number) => run(() => cart.setQuantity(id, qty), 'Failed to update quantity.')
+
+const remove = (id: number) => run(() => cart.remove(id), 'Failed to remove item.')
+
+const checkout = () => run( async () => { thanks.value = await cart.checkout('Default Shipping Address') }, 'Checkout failed.', )
+
+onMounted(() => run(() => cart.load(), 'Failed to load cart.'))
+
 </script>
 
 <template>

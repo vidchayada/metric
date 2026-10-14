@@ -91,8 +91,8 @@ describe('DashboardView', () => {
 
 describe('OrdersView', () => {
   const orders = [
-    { id: 1, orderNumber: '#1001', orderDate: '2026-10-01', orderName: 'Linen Shirt', customer: 'mina', status: 'pending' },
-    { id: 2, orderNumber: '#1002', orderDate: '2026-10-02', orderName: null, customer: null, status: 'shipped' },
+    { id: 1, orderNumber: '#1001', orderDate: '2026-10-01', orderName: 'Linen Shirt', customer: 'mina', status: 'PENDING' },
+    { id: 2, orderNumber: '#1002', orderDate: '2026-10-02', orderName: null, customer: null, status: 'SHIPPED' },
   ]
   // fresh copies per call: the view mutates rows optimistically, and tests must not share that state
   const page = (items = orders, p = 1, totalPages = 1) => ({
@@ -129,9 +129,9 @@ describe('OrdersView', () => {
     await settle()
     expect(router.currentRoute.value.query.month).toBe('3')
 
-    await wrapper.find('#status').setValue('shipped')
+    await wrapper.find('#status').setValue('SHIPPED')
     await settle()
-    expect(api.orders).toHaveBeenLastCalledWith({ search: 'linen', month: 3, status: 'shipped', page: 1 })
+    expect(api.orders).toHaveBeenLastCalledWith({ search: 'linen', month: 3, status: 'SHIPPED', page: 1 })
 
     await wrapper.find('#status').setValue('')
     await settle()
@@ -151,19 +151,19 @@ describe('OrdersView', () => {
     api.orders.mockResolvedValue(page())
     api.updateOrderStatus.mockResolvedValue({})
     const { wrapper } = await open(OrdersView, '/admin/orders')
-    await wrapper.find('select[aria-label="Status of #1001"]').setValue('completed')
+    await wrapper.find('select[aria-label="Status of #1001"]').setValue('COMPLETED')
     await settle()
-    expect(api.updateOrderStatus).toHaveBeenCalledWith(1, 'completed')
-    expect((wrapper.find('select[aria-label="Status of #1001"]').element as HTMLSelectElement).value).toBe('completed')
+    expect(api.updateOrderStatus).toHaveBeenCalledWith(1, 'COMPLETED')
+    expect((wrapper.find('select[aria-label="Status of #1001"]').element as HTMLSelectElement).value).toBe('COMPLETED')
   })
 
   it('reverts the status and warns when the update fails', async () => {
     api.orders.mockResolvedValue(page())
     api.updateOrderStatus.mockRejectedValue(axiosErr(500, { message: 'Nope' }))
     const { wrapper, pinia } = await open(OrdersView, '/admin/orders')
-    await wrapper.find('select[aria-label="Status of #1001"]').setValue('completed')
+    await wrapper.find('select[aria-label="Status of #1001"]').setValue('COMPLETED')
     await settle()
-    expect((wrapper.find('select[aria-label="Status of #1001"]').element as HTMLSelectElement).value).toBe('pending')
+    expect((wrapper.find('select[aria-label="Status of #1001"]').element as HTMLSelectElement).value).toBe('PENDING')
     expect(lastToast(pinia)?.message).toBe('Nope')
   })
 

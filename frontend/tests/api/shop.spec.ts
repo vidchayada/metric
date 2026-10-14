@@ -68,7 +68,9 @@ describe('shop api', () => {
     expect(post).toHaveBeenCalledWith('/cart/items', { productId: 1, attributeId: 2, quantity: 3 })
     expect(patch).toHaveBeenCalledWith('/cart/items/9', { quantity: 5 })
     expect(del).toHaveBeenCalledWith('/cart/items/9')
-    expect(post).toHaveBeenCalledWith('/cart/checkout')
+    expect(post).toHaveBeenCalledWith('/orders/checkout', {
+      shippingAddress: 'Default Address',
+    })
   })
 
   it('subscribes an email', async () => {

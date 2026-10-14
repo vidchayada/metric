@@ -20,6 +20,8 @@ interface ProductAttribute {
 interface ProductImage {
   id: number | string
   url: string
+  primary?: boolean
+  sortOrder?: number
 }
 
 interface ProductData {
@@ -52,15 +54,37 @@ const adding = ref(false)
 
 const images = computed<ProductImage[]>(() => {
   if (!product.value) return []
+
   if (Array.isArray(product.value.imageUrls)) {
-    return product.value.imageUrls.map((url, idx) => ({ id: idx, url }))
-  }
-  if (Array.isArray(product.value.images)) {
-    return product.value.images.map((img, idx) => ({
-      id: typeof img === 'object' && img && 'id' in img && img.id ? img.id : idx,
-      url: typeof img === 'string' ? img : (img?.url ?? (img as any)?.imageUrl ?? ''),
+    return product.value.imageUrls.map((url, idx) => ({
+      id: idx,
+      url,
     }))
   }
+
+  if (Array.isArray(product.value.images)) {
+    return product.value.images
+        .map((img, idx) => ({
+          id:
+              typeof img === 'object' && img?.id != null
+                  ? img.id
+                  : idx,
+          url:
+              typeof img === 'string'
+                  ? img
+                  : (img?.url ?? img?.imageUrl ?? ''),
+          primary:
+              typeof img === 'object' && img
+                  ? Boolean((img as { primary?: boolean }).primary)
+                  : false,
+          sortOrder:
+              typeof img === 'object' && img
+                  ? (img as { sortOrder?: number }).sortOrder
+                  : undefined,
+        }))
+        .filter((img) => img.url)
+  }
+
   return []
 })
 
@@ -100,9 +124,14 @@ async function load(id: number) {
     const p = (await catalogApi.product(id)) as ProductData
     product.value = p
 
-    const imgList = Array.isArray(p.imageUrls) ? p.imageUrls : (p.images ?? [])
-    const firstImg = imgList[0]
-    activeImage.value = typeof firstImg === 'string' ? firstImg : (firstImg?.url ?? null)
+    const primaryImage = images.value.find((img) => img.primary)
+
+    const firstImage = primaryImage
+        ?? [...images.value].sort(
+            (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+        )[0]
+
+    activeImage.value = firstImage?.url ?? null
 
     color.value = colors.value[0] ?? null
     size.value = null
