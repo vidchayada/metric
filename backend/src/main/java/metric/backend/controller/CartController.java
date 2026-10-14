@@ -38,19 +38,11 @@ public class CartController {
         if (user == null) {
             return ResponseEntity.ok(Map.of("count", 0));
         }
-
-        try {
-            CartResponse cart = cartService.getCart(user.getUserId());
-            int count = 0;
-            if (cart != null && cart.getItems() != null) {
-                count = cart.getItems().stream()
-                        .mapToInt(item -> item.getQuantity() != null ? item.getQuantity() : 1)
-                        .sum();
-            }
-            return ResponseEntity.ok(Map.of("count", count));
-        } catch (Exception e) {
-            return ResponseEntity.ok(Map.of("count", 0));
-        }
+        CartResponse cart = cartService.getCart(user.getUserId());
+        int count = cart.getItems() == null ? 0 : cart.getItems().stream()
+            .mapToInt(item -> item.getQuantity() != null ? item.getQuantity() : 1)
+            .sum();
+        return ResponseEntity.ok(Map.of("count", count));
     }
 
     @PostMapping({"", "/items"})

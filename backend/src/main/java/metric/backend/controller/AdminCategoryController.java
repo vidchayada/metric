@@ -2,7 +2,10 @@ package metric.backend.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
+
 import lombok.RequiredArgsConstructor;
 import metric.backend.entity.Category;
 import metric.backend.repository.CategoryRepository;
@@ -17,6 +20,14 @@ public class AdminCategoryController {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+
+    private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
+    private static final Pattern EDGE_DASH = Pattern.compile("(?:^-|-$)");
+
+    private static String toSlug(String name) {
+        String dashed = NON_ALNUM.matcher(name.toLowerCase(Locale.ROOT)).replaceAll("-");
+        return EDGE_DASH.matcher(dashed).replaceAll("");
+    }
 
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllCategories(
@@ -63,8 +74,7 @@ public class AdminCategoryController {
     public ResponseEntity<Category> createCategory(@RequestBody Map<String, String> body) {
         String name = body.get("name") != null ? body.get("name") : body.get("categoryName");
         String visibility = body.getOrDefault("visibility", "show");
-        String slug = name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
-
+        String slug = toSlug(name);
         Category category = Category.builder()
                 .categoryName(name)
                 .slug(slug)
@@ -82,7 +92,7 @@ public class AdminCategoryController {
         if (body.containsKey("name")) {
             String name = body.get("name");
             category.setCategoryName(name);
-            category.setSlug(name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", ""));
+            category.setSlug(toSlug(name));
         }
         if (body.containsKey("visibility")) {
             category.setVisibility(body.get("visibility"));
