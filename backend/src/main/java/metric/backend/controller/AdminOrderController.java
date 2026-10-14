@@ -33,17 +33,10 @@ public class AdminOrderController {
 
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @PathVariable Long orderId,
-            @RequestBody java.util.Map<String, String> payload) {
+        @PathVariable Long orderId,
+        @Valid @RequestBody UpdateOrderStatusRequest request) {
 
-        String statusStr = payload.get("status");
-        if (statusStr == null || statusStr.trim().isEmpty()) {
-            throw new IllegalArgumentException("Status is required");
-        }
-        metric.backend.entity.OrderStatus newStatus =
-                metric.backend.entity.OrderStatus.valueOf(statusStr.toUpperCase());
-
-        OrderResponse updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
-        return ResponseEntity.ok(updatedOrder);
+        return ResponseEntity.ok(
+            orderService.updateOrderStatus(orderId, request.getStatus()));
     }
 }

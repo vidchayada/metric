@@ -7,6 +7,7 @@ import java.security.Principal;
 import java.util.Optional;
 import metric.backend.dto.AuthResponse;
 import metric.backend.dto.LoginRequest;
+import metric.backend.entity.Role;
 import metric.backend.entity.User;
 import metric.backend.repository.UserRepository;
 import metric.backend.service.AuthService;
@@ -20,15 +21,20 @@ import org.springframework.http.HttpStatus;
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-  @Mock AuthService authService;
-  @Mock UserRepository userRepository;
+  @Mock
+  AuthService authService;
 
-  @InjectMocks AuthController controller;
+  @Mock
+  UserRepository userRepository;
+
+  @InjectMocks
+  AuthController controller;
 
   @Test
   void loginShouldReturnAuthResponse() {
     LoginRequest request = mock(LoginRequest.class);
     AuthResponse expected = mock(AuthResponse.class);
+
     when(authService.login(request)).thenReturn(expected);
 
     var response = controller.login(request);
@@ -64,6 +70,7 @@ class AuthControllerTest {
   @Test
   void registerShouldReturnTokenOnSuccess() {
     AuthResponse auth = mock(AuthResponse.class);
+
     when(authService.register("alice", "alice@example.com", "secret"))
         .thenReturn(auth);
     when(auth.getToken()).thenReturn("jwt-token");
@@ -78,6 +85,7 @@ class AuthControllerTest {
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("jwt-token", response.getBody().get("token"));
     assertEquals("alice", response.getBody().get("username"));
+
     verify(authService).register(
         "alice", "alice@example.com", "secret");
   }
@@ -114,7 +122,8 @@ class AuthControllerTest {
     when(found.getUserId()).thenReturn(1L);
     when(found.getUsername()).thenReturn("alice");
     when(found.getEmail()).thenReturn("alice@example.com");
-    when(found.getRole()).thenReturn("USER");
+    when(found.getRole()).thenReturn(Role.USER);
+
     when(userRepository.findByUsername("alice"))
         .thenReturn(Optional.of(found));
 
@@ -125,17 +134,19 @@ class AuthControllerTest {
     assertEquals(1L, response.getBody().get("userId"));
     assertEquals("alice", response.getBody().get("username"));
     assertEquals("alice@example.com", response.getBody().get("email"));
-    assertEquals("USER", response.getBody().get("role"));
+    assertEquals(Role.USER, response.getBody().get("role"));
   }
 
   @Test
   void getCurrentUserShouldUsePrincipalWhenAuthenticationPrincipalIsNotUser() {
     Principal principal = () -> "bob";
+
     User found = mock(User.class);
     when(found.getUserId()).thenReturn(2L);
     when(found.getUsername()).thenReturn("bob");
     when(found.getEmail()).thenReturn("bob@example.com");
-    when(found.getRole()).thenReturn("USER");
+    when(found.getRole()).thenReturn(Role.USER);
+
     when(userRepository.findByUsername("bob"))
         .thenReturn(Optional.of(found));
 
@@ -148,6 +159,7 @@ class AuthControllerTest {
   @Test
   void getCurrentUserShouldReturnUnauthorizedWhenUserNotFound() {
     Principal principal = () -> "unknown";
+
     when(userRepository.findByUsername("unknown"))
         .thenReturn(Optional.empty());
 
