@@ -60,10 +60,8 @@ public class ProductService {
     public List<ProductResponse> getProducts(Long categoryId, String search) {
         return productRepository.findAll().stream()
                 .filter(p -> {
-                    if (categoryId != null && p.getCategory() != null) {
-                        if (!categoryId.equals(p.getCategory().getCategoryId())) {
-                            return false;
-                        }
+                    if (categoryId != null && p.getCategory() != null && !categoryId.equals(p.getCategory().getCategoryId())) {
+                        return false;
                     }
                     if (search != null && !search.trim().isEmpty()) {
                         String keyword = search.trim().toLowerCase();

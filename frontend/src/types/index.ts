@@ -1,13 +1,13 @@
 export type Role = 'USER' | 'ADMIN'
 export type Visibility = 'show' | 'hidden'
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled'
+export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'COMPLETED' | 'CANCELLED'
 
 export const ORDER_STATUSES: OrderStatus[] = [
-    'pending',
-    'processing',
-    'shipped',
-    'completed',
-    'cancelled',
+    'PENDING',
+    'PROCESSING',
+    'SHIPPED',
+    'COMPLETED',
+    'CANCELLED',
 ]
 
 export interface User {

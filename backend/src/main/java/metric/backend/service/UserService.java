@@ -1,3 +1,10 @@
+/*
+- Copyright (c) 2026 Vidchayada
+
+- Licensed under the MIT License.
+
+ */
+
 package metric.backend.service;
 
 import java.io.IOException;
@@ -20,18 +27,19 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserService {
 
     private final UserRepository userRepository;
+    private static final String USER_NOT_FOUND = "User not found";
 
     @Transactional(readOnly = true)
     public Map<String, Object> getCurrentUserProfile(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
         return mapToUserResponse(user);
     }
 
     @Transactional
     public Map<String, Object> updateProfile(Long userId, UpdateProfileRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND));
 
         if (request.getFullName() != null) {
             user.setFullName(request.getFullName());
@@ -47,13 +55,14 @@ public class UserService {
         }
 
         User savedUser = userRepository.save(user);
-        return getCurrentUserProfile(savedUser.getUserId());
+
+        return mapToUserResponse(savedUser);
     }
 
     @Transactional
     public Map<String, Object> uploadAvatar(Long userId, MultipartFile file) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File cannot be empty");
@@ -65,7 +74,8 @@ public class UserService {
             user.setProfileImage("data:" + contentType + ";base64," + base64Content);
             userRepository.save(user);
             return mapToUserResponse(user);
-        } catch (IOException e) {                       // import java.io.IOException
+
+        } catch (IOException e) {
             log.error("Failed to read avatar upload for user {}", userId, e);
             throw new IllegalStateException("Failed to upload avatar", e);
         }

@@ -10,6 +10,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,21 +24,21 @@ public class JwtTokenProvider {
 
     public JwtTokenProvider(
             @Value("${jwt.secret:mySecretKeyForMetricProjectMustBeAtLeast32BytesLong}") String secret,
-            @Value("${jwt.expiration:86400000}") long validityInMilliseconds) { // 24 ชม.
+            @Value("${jwt.expiration:86400000}") long validityInMilliseconds) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.validityInMilliseconds = validityInMilliseconds;
     }
 
     public String createToken(String username, String role, Long userId) {
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Instant now = Instant.now();
+        Instant validity = now.plusMillis(validityInMilliseconds);
 
         return Jwts.builder()
                 .subject(username)
                 .claim("role", role)
                 .claim("userId", userId)
-                .issuedAt(now)
-                .expiration(validity)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(validity))
                 .signWith(key)
                 .compact();
     }

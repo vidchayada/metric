@@ -47,10 +47,17 @@ function setFilter(key: 'search' | 'month' | 'status', value: string) {
 const goTo = (p: number) => router.push({ query: { ...route.query, page: p } })
 
 async function changeStatus(order: AdminOrder, next: OrderStatus) {
+  const targetId = (order as any).id ?? (order as any).orderId
+  if (!targetId) {
+    toast.error('Order ID not found')
+    return
+  }
+
   const previous = order.status
   order.status = next
   try {
-    await adminApi.updateOrderStatus(order.id, next)
+    await adminApi.updateOrderStatus(targetId, next)
+    toast.success('Status updated successfully')
   } catch (e) {
     order.status = previous
     toast.error(apiError(e, 'Could not update status.'))

@@ -3,12 +3,10 @@ package metric.backend.controller;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import metric.backend.entity.Order;
 import metric.backend.entity.OrderItem;
 import metric.backend.entity.Product;
-import metric.backend.repository.OrderItemRepository; // * เพิ่ม Repository สำหรับดึง OrderItem ถ้ามี
 import metric.backend.repository.OrderRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +16,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AdminSalesController {
 
+    private static final String CANCELLED = "cancelled";
+    private static final int DEFAULT_MONTH = 3;
+    private static final int DEFAULT_YEAR = 2026;
+
     private final OrderRepository orderRepository;
 
     @GetMapping
@@ -26,76 +28,71 @@ public class AdminSalesController {
             @RequestParam(required = false) Integer dailyYear,
             @RequestParam(required = false) Integer monthlyYear) {
 
-        Map<String, Object> response = new HashMap<>();
-        List<Order> allOrders = orderRepository.findAll();
-
-        List<Order> validOrders = allOrders.stream()
-                .filter(o -> o.getTotalAmount() != null && !"cancelled".equalsIgnoreCase(String.valueOf(o.getStatus())))
+        List<Order> validOrders = orderRepository.findAll().stream()
+                .filter(o -> o.getTotalAmount() != null && !CANCELLED.equalsIgnoreCase(String.valueOf(o.getStatus())))
                 .toList();
 
-        int targetMonth = dailyMonth != null ? dailyMonth : 3;
-        int targetYear = dailyYear != null ? dailyYear : 2026;
-        int tYear = monthlyYear != null ? monthlyYear : 2026;
+        int targetMonth = dailyMonth != null ? dailyMonth : DEFAULT_MONTH;
+        int targetYear = dailyYear != null ? dailyYear : DEFAULT_YEAR;
+        int tYear = monthlyYear != null ? monthlyYear : DEFAULT_YEAR;
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("daily", buildDailySales(validOrders, targetMonth, targetYear));
+        response.put("monthly", buildMonthlySales(validOrders, tYear));
+        response.put("topProducts", buildTopProducts(validOrders));
+
+        return ResponseEntity.ok(response);
+    }
+
+    private List<Map<String, Object>> buildDailySales(List<Order> orders, int targetMonth, int targetYear) {
         Map<String, BigDecimal> dailyMap = new LinkedHashMap<>();
-        Map<Integer, BigDecimal> monthlyMap = new TreeMap<>();
-        Map<String, ProductSalesStat> productStatMap = new HashMap<>();
-
-        for (Order o : validOrders) {
+        for (Order o : orders) {
             OffsetDateTime orderDate = o.getOrderDate();
-            if (orderDate != null) {
-                int oYear = orderDate.getYear();
-                int oMonth = orderDate.getMonthValue();
-                int oDay = orderDate.getDayOfMonth();
-
-                if (oMonth == targetMonth && oYear == targetYear) {
-                    String dayKey = String.format("%04d-%02d-%02d", oYear, oMonth, oDay);
-                    dailyMap.put(dayKey, dailyMap.getOrDefault(dayKey, BigDecimal.ZERO).add(o.getTotalAmount()));
-                }
-
-                if (oYear == tYear) {
-                    monthlyMap.put(oMonth, monthlyMap.getOrDefault(oMonth, BigDecimal.ZERO).add(o.getTotalAmount()));
-                }
-
-                try {
-                    if (o.getOrderItems() != null && !o.getOrderItems().isEmpty()) {
-                        for (OrderItem item : o.getOrderItems()) {
-                            Product p = item.getProduct();
-                            if (p != null) {
-                                String pName = p.getProductName();
-                                String imgUrl = null;
-                                if (p.getImages() != null && !p.getImages().isEmpty()) {
-                                    imgUrl = p.getImages().get(0).getImageUrl();
-                                }
-
-                                productStatMap.putIfAbsent(pName, new ProductSalesStat(pName, imgUrl, 0));
-                                ProductSalesStat stat = productStatMap.get(pName);
-                                stat.totalOrders += item.getQuantity();
-                            }
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
+            if (orderDate == null || orderDate.getMonthValue() != targetMonth || orderDate.getYear() != targetYear) {
+                continue;
             }
+            String dayKey = String.format("%04d-%02d-%02d",
+                    orderDate.getYear(), orderDate.getMonthValue(), orderDate.getDayOfMonth());
+            dailyMap.merge(dayKey, o.getTotalAmount(), BigDecimal::add);
         }
 
         List<Map<String, Object>> dailySales = new ArrayList<>();
-        dailyMap.forEach((date, sum) -> {
-            Map<String, Object> item = new HashMap<>();
-            item.put("label", date);
-            item.put("totalSales", sum);
-            dailySales.add(item);
-        });
+        dailyMap.forEach((date, sum) -> dailySales.add(toLabelSumMap(date, sum)));
+        return dailySales;
+    }
+
+    private List<Map<String, Object>> buildMonthlySales(List<Order> orders, int targetYear) {
+        Map<Integer, BigDecimal> monthlyMap = new TreeMap<>();
+        for (Order o : orders) {
+            OffsetDateTime orderDate = o.getOrderDate();
+            if (orderDate == null || orderDate.getYear() != targetYear) {
+                continue;
+            }
+            monthlyMap.merge(orderDate.getMonthValue(), o.getTotalAmount(), BigDecimal::add);
+        }
 
         List<Map<String, Object>> monthlySales = new ArrayList<>();
-        monthlyMap.forEach((month, sum) -> {
-            Map<String, Object> item = new HashMap<>();
-            item.put("label", "Month " + month);
-            item.put("totalSales", sum);
-            monthlySales.add(item);
-        });
+        monthlyMap.forEach((month, sum) -> monthlySales.add(toLabelSumMap("Month " + month, sum)));
+        return monthlySales;
+    }
 
-        List<Map<String, Object>> topProducts = productStatMap.values().stream()
+    private Map<String, Object> toLabelSumMap(String label, BigDecimal sum) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("label", label);
+        item.put("totalSales", sum);
+        return item;
+    }
+
+    private List<Map<String, Object>> buildTopProducts(List<Order> orders) {
+        Map<String, ProductSalesStat> productStatMap = new HashMap<>();
+        for (Order o : orders) {
+            if (o.getOrderDate() == null || o.getOrderItems() == null || o.getOrderItems().isEmpty()) {
+                continue;
+            }
+            accumulateProductStats(o, productStatMap);
+        }
+
+        return productStatMap.values().stream()
                 .sorted((a, b) -> Integer.compare(b.totalOrders, a.totalOrders))
                 .limit(5)
                 .map(stat -> {
@@ -106,12 +103,26 @@ public class AdminSalesController {
                     return m;
                 })
                 .toList();
+    }
 
-        response.put("daily", dailySales);
-        response.put("monthly", monthlySales);
-        response.put("topProducts", topProducts);
+    private void accumulateProductStats(Order order, Map<String, ProductSalesStat> productStatMap) {
+        try {
+            for (OrderItem item : order.getOrderItems()) {
+                Product p = item.getProduct();
+                if (p == null) {
+                    continue;
+                }
+                String pName = p.getProductName();
+                String imgUrl = (p.getImages() != null && !p.getImages().isEmpty())
+                        ? p.getImages().get(0).getImageUrl()
+                        : null;
 
-        return ResponseEntity.ok(response);
+                productStatMap.putIfAbsent(pName, new ProductSalesStat(pName, imgUrl, 0));
+                productStatMap.get(pName).totalOrders += item.getQuantity();
+            }
+        } catch (Exception e) {
+            //fix
+        }
     }
 
     private static class ProductSalesStat {

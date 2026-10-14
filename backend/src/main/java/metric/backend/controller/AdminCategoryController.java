@@ -22,7 +22,7 @@ public class AdminCategoryController {
     private final ProductRepository productRepository;
 
     private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
-
+    private static final String VISIBILITY = "visibility";
     private static String toSlug(String name) {
         String dashed = NON_ALNUM.matcher(name.toLowerCase(Locale.ROOT)).replaceAll("-");
         int start = dashed.startsWith("-") ? 1 : 0;
@@ -37,10 +37,9 @@ public class AdminCategoryController {
 
         List<Map<String, Object>> response = categoryRepository.findAll().stream()
                 .filter(c -> {
-                    if (filter != null && !filter.trim().isEmpty()) {
-                        if (!filter.equalsIgnoreCase(c.getVisibility())) {
-                            return false;
-                        }
+                    if (filter != null && !filter.trim().isEmpty()
+                            && !filter.equalsIgnoreCase(c.getVisibility())) {
+                        return false;
                     }
 
                     if (search != null && !search.trim().isEmpty()) {
@@ -59,7 +58,7 @@ public class AdminCategoryController {
                     map.put("name", c.getCategoryName());
                     map.put("categoryName", c.getCategoryName());
                     map.put("slug", c.getSlug());
-                    map.put("visibility", c.getVisibility());
+                    map.put(VISIBILITY, c.getVisibility());
 
                     long count = productRepository.findAll().stream()
                             .filter(p -> p.getCategory() != null && catId.equals(p.getCategory().getCategoryId()))
@@ -73,8 +72,10 @@ public class AdminCategoryController {
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Map<String, String> body) {
-        String name = body.get("name") != null ? body.get("name") : body.get("categoryName");
-        String visibility = body.getOrDefault("visibility", "show");
+
+        String nameParam = body.get("name");
+        String name = nameParam != null ? nameParam : body.get("categoryName");
+        String visibility = body.getOrDefault(VISIBILITY, "show");
         String slug = toSlug(name);
         Category category = Category.builder()
                 .categoryName(name)
@@ -95,8 +96,8 @@ public class AdminCategoryController {
             category.setCategoryName(name);
             category.setSlug(toSlug(name));
         }
-        if (body.containsKey("visibility")) {
-            category.setVisibility(body.get("visibility"));
+        if (body.containsKey(VISIBILITY)) {
+            category.setVisibility(body.get(VISIBILITY));
         }
 
         return ResponseEntity.ok(categoryRepository.save(category));
@@ -107,8 +108,8 @@ public class AdminCategoryController {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
 
-        if (body.containsKey("visibility")) {
-            category.setVisibility(body.get("visibility"));
+        if (body.containsKey(VISIBILITY)) {
+            category.setVisibility(body.get(VISIBILITY));
         }
         return ResponseEntity.ok(categoryRepository.save(category));
     }

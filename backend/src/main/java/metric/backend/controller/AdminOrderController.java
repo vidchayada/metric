@@ -9,6 +9,7 @@ import metric.backend.dto.UpdateOrderStatusRequest;
 import metric.backend.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 @RequestMapping("/api/admin/orders")
@@ -30,10 +31,19 @@ public class AdminOrderController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{orderId}/status")
+    @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long orderId,
-            @Valid @RequestBody UpdateOrderStatusRequest request) {
-        return ResponseEntity.ok(orderService.updateOrderStatus(orderId, request.getStatus()));
+            @RequestBody java.util.Map<String, String> payload) {
+
+        String statusStr = payload.get("status");
+        if (statusStr == null || statusStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status is required");
+        }
+        metric.backend.entity.OrderStatus newStatus =
+                metric.backend.entity.OrderStatus.valueOf(statusStr.toUpperCase());
+
+        OrderResponse updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
+        return ResponseEntity.ok(updatedOrder);
     }
 }

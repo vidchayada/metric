@@ -28,6 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private static final String MESSAGE = "message"; // fix for S1192 (duplicated 3x)
+    private static final String ERROR = "error"; // fix for S1192 (duplicated 2x)
+    private static final String USERNAME = "username";
+
     private final AuthService authService;
     private final UserRepository userRepository;
 
@@ -38,25 +42,25 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
+        String username = body.get(USERNAME);
         String email = body.get("email");
         String password = body.get("password");
 
         if (username == null || username.trim().isEmpty() ||
                 email == null || email.trim().isEmpty() ||
                 password == null || password.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "All fields are required."));
+            return ResponseEntity.badRequest().body(Map.of(MESSAGE, "All fields are required."));
         }
 
         try {
             AuthResponse res = authService.register(username.trim(), email.trim(), password);
             return ResponseEntity.ok(Map.of(
-                    "message", "User registered successfully",
+                    MESSAGE, "User registered successfully",
                     "token", res.getToken(),
-                    "username", res.getUsername()
+                    USERNAME, res.getUsername()
             ));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(MESSAGE, e.getMessage()));
         }
     }
 
@@ -73,7 +77,7 @@ public class AuthController {
         }
 
         if (username == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            return ResponseEntity.status(401).body(Map.of(ERROR, "Unauthorized"));
         }
 
         return userRepository.findByUsername(username)
@@ -81,11 +85,11 @@ public class AuthController {
                     Map<String, Object> response = new HashMap<>();
                     response.put("id", u.getUserId());
                     response.put("userId", u.getUserId());
-                    response.put("username", u.getUsername());
+                    response.put(USERNAME, u.getUsername());
                     response.put("email", u.getEmail());
                     response.put("role", u.getRole());
                     return ResponseEntity.ok(response);
                 })
-                .orElseGet(() -> ResponseEntity.status(401).body(Map.of("error", "User not found")));
+                .orElseGet(() -> ResponseEntity.status(401).body(Map.of(ERROR, "User not found")));
     }
 }

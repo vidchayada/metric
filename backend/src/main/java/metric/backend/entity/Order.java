@@ -62,7 +62,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 12)
     @Builder.Default
-    private OrderStatus status = OrderStatus.pending;
+    private OrderStatus status = OrderStatus.PENDING;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
