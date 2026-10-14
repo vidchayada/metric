@@ -22,11 +22,12 @@ public class AdminCategoryController {
     private final ProductRepository productRepository;
 
     private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
-    private static final Pattern EDGE_DASH = Pattern.compile("(?:^-|-$)");
 
     private static String toSlug(String name) {
         String dashed = NON_ALNUM.matcher(name.toLowerCase(Locale.ROOT)).replaceAll("-");
-        return EDGE_DASH.matcher(dashed).replaceAll("");
+        int start = dashed.startsWith("-") ? 1 : 0;
+        int end = dashed.length() > start && dashed.endsWith("-") ? dashed.length() - 1 : dashed.length();
+        return dashed.substring(start, end);
     }
 
     @GetMapping
