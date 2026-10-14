@@ -41,7 +41,6 @@ public class CartController {
         if (user == null) {
             return ResponseEntity.ok(Map.of(COUNT, 0));
         }
-
         try {
             CartResponse cart = cartService.getCart(user.getUserId());
             int count = 0;

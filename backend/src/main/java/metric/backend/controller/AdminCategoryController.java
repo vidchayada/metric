@@ -23,7 +23,6 @@ public class AdminCategoryController {
 
     private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
     private static final String VISIBILITY = "visibility";
-
     private static String toSlug(String name) {
         String dashed = NON_ALNUM.matcher(name.toLowerCase(Locale.ROOT)).replaceAll("-");
         int start = dashed.startsWith("-") ? 1 : 0;
@@ -73,6 +72,7 @@ public class AdminCategoryController {
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Map<String, String> body) {
+
         String nameParam = body.get("name");
         String name = nameParam != null ? nameParam : body.get("categoryName");
         String visibility = body.getOrDefault(VISIBILITY, "show");

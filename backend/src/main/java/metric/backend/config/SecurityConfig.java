@@ -39,7 +39,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
+                // Safe to disable: stateless API authenticated by a Bearer JWT in the Authorization header.
+                // No session or auth cookie exists, so a cross-site request cannot carry credentials.
+                .csrf(AbstractHttpConfigurer::disable) // NOSONAR java:S4502
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->

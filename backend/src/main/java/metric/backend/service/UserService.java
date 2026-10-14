@@ -7,11 +7,13 @@
 
 package metric.backend.service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import metric.backend.dto.UpdateProfileRequest;
 import metric.backend.entity.User;
 import metric.backend.repository.UserRepository;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -68,14 +71,13 @@ public class UserService {
         try {
             String contentType = file.getContentType() != null ? file.getContentType() : "image/jpeg";
             String base64Content = java.util.Base64.getEncoder().encodeToString(file.getBytes());
-            String dataUrl = "data:" + contentType + ";base64," + base64Content;
-
-            user.setProfileImage(dataUrl);
+            user.setProfileImage("data:" + contentType + ";base64," + base64Content);
             userRepository.save(user);
-
             return mapToUserResponse(user);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to upload avatar: " + e.getMessage(), e);
+
+        } catch (IOException e) {
+            log.error("Failed to read avatar upload for user {}", userId, e);
+            throw new IllegalStateException("Failed to upload avatar", e);
         }
     }
 

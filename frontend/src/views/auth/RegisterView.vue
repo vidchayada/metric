@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { authApi } from '@/api/shop'
 import { fieldErrors, statusOf } from '@/api/client'
 import type { FieldErrors } from '@/types'
+import { isValidEmail } from '@/utils/validation'
 
 const router = useRouter()
 const form = reactive({ username: '', email: '', password: '', terms: false })
@@ -15,7 +16,7 @@ function validate(): boolean {
   const e: FieldErrors = {}
   if (!form.username.trim()) e.username = 'Username is required'
   if (!form.email.trim()) e.email = 'Email is required'
-  else if (!/^\S+@\S+\.\S+$/.test(form.email)) e.email = 'Enter a valid email'
+  else if (!isValidEmail(form.email)) e.email = 'Enter a valid email'
   if (!form.password) e.password = 'Password is required'
   else if (form.password.length < 8) e.password = 'Password must be at least 8 characters'
   if (!form.terms) e.general = 'Please accept the terms and privacy policy'
